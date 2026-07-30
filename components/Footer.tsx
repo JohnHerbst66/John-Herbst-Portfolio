@@ -41,6 +41,12 @@ export default function Footer() {
         >
           linkedin →
         </a>
+        <a
+          href="/admin"
+          className="text-paper hover:text-blueprint transition-colors"
+        >
+          portfolio →
+        </a>
       </div>
       <p className="font-mono text-xs text-muted mt-12">
         built with next.js · updated automatically from github
