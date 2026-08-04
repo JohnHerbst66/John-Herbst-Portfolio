@@ -1,70 +1,90 @@
 import crypto from "crypto";
-import { cookies } from "next/headers";
 
-export const SESSION_COOKIE_NAME = "admin_session";
+export const SESSION_COOKIE_NAME = "admin_token";
 export const SESSION_TTL_SECONDS = 60 * 60 * 24; // 24h
 
-// Hardcoded hashed password: Johnalbert2005#
-// Hash: scrypt with random salt, one-way
+// Hashed password (scrypt, one-way). Plaintext is never stored.
 const HARDCODED_PASSWORD_HASH =
   "7ddc52769090f64dfdebfbb17260de76:27bcd4e4f98cefb296d0d6f5a17d8603eb3d322ee4a3422988216a416e680653a45299e9fff13f97c3750123fa169d6cc2675c2ffb68ffae6469ebe85c44221f";
-const SESSION_SECRET =
-  "portfolio_admin_session_secret_key_do_not_share_outside_code";
 
-function verifyPasswordHash(password: string, stored: string): boolean {
-  const [salt, hashHex] = stored.split(":");
+// Set ADMIN_JWT_SECRET in Vercel to make forged tokens impossible.
+// The fallback exists so the app still builds without it.
+const JWT_SECRET =
+  process.env.ADMIN_JWT_SECRET ?? "portfolio_admin_dev_fallback_secret";
+
+/* ---------- password ---------- */
+
+export function verifyPassword(candidate: string): boolean {
+  const [salt, hashHex] = HARDCODED_PASSWORD_HASH.split(":");
   if (!salt || !hashHex) return false;
 
   try {
-    const candidate = crypto.scryptSync(password, salt, 64);
+    const derived = crypto.scryptSync(candidate, salt, 64);
     const expected = Buffer.from(hashHex, "hex");
     return (
-      candidate.length === expected.length &&
-      crypto.timingSafeEqual(candidate, expected)
+      derived.length === expected.length &&
+      crypto.timingSafeEqual(derived, expected)
     );
   } catch {
     return false;
   }
 }
 
-function sign(value: string): string {
-  return crypto.createHmac("sha256", SESSION_SECRET).update(value).digest("hex");
+/* ---------- JWT (HS256) ---------- */
+
+function b64url(input: Buffer | string): string {
+  return Buffer.from(input)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
-export function verifyPassword(candidate: string): boolean {
-  return verifyPasswordHash(candidate, HARDCODED_PASSWORD_HASH);
+function b64urlDecode(input: string): Buffer {
+  const pad = input.length % 4 === 0 ? "" : "=".repeat(4 - (input.length % 4));
+  return Buffer.from(input.replace(/-/g, "+").replace(/_/g, "/") + pad, "base64");
 }
 
-export function createSessionCookieValue(): string {
-  const issuedAt = Date.now().toString();
-  return `${issuedAt}.${sign(issuedAt)}`;
+function signHS256(data: string): string {
+  return b64url(crypto.createHmac("sha256", JWT_SECRET).update(data).digest());
 }
 
-function verifySessionCookieValue(value: string | undefined): boolean {
-  if (!value) return false;
-
-  const [issuedAt, signature] = value.split(".");
-  if (!issuedAt || !signature) return false;
-
-  const expected = sign(issuedAt);
-  const a = Buffer.from(expected);
-  const b = Buffer.from(signature);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
-
-  const age = Date.now() - Number(issuedAt);
-  return age >= 0 && age < SESSION_TTL_SECONDS * 1000;
+export function createToken(): string {
+  const now = Math.floor(Date.now() / 1000);
+  const header = b64url(JSON.stringify({ alg: "HS256", typ: "JWT" }));
+  const payload = b64url(
+    JSON.stringify({ sub: "admin", iat: now, exp: now + SESSION_TTL_SECONDS })
+  );
+  const body = `${header}.${payload}`;
+  return `${body}.${signHS256(body)}`;
 }
 
-export function isAuthed(): boolean {
-  return verifySessionCookieValue(cookies().get(SESSION_COOKIE_NAME)?.value);
+export function verifyToken(token: string | undefined): boolean {
+  if (!token) return false;
+
+  const parts = token.split(".");
+  if (parts.length !== 3) return false;
+
+  const [header, payload, signature] = parts;
+
+  const expected = Buffer.from(signHS256(`${header}.${payload}`));
+  const actual = Buffer.from(signature);
+  if (expected.length !== actual.length) return false;
+  if (!crypto.timingSafeEqual(expected, actual)) return false;
+
+  try {
+    const claims = JSON.parse(b64urlDecode(payload).toString("utf8"));
+    if (claims.sub !== "admin") return false;
+    return typeof claims.exp === "number" && claims.exp > Date.now() / 1000;
+  } catch {
+    return false;
+  }
 }
 
-export function setSessionCookie(): void {
-  cookies().set(SESSION_COOKIE_NAME, createSessionCookieValue(), {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_TTL_SECONDS,
-  });
-}
+export const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: SESSION_TTL_SECONDS,
+};

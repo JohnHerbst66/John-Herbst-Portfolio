@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
-import { verifyPassword } from "@/lib/auth";
+import { SESSION_COOKIE_NAME, verifyToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    if (!verifyToken(request.cookies.get(SESSION_COOKIE_NAME)?.value)) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
-    const password = formData.get("password") as string;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
-    }
-
-    if (!password || !verifyPassword(password)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const bytes = await file.arrayBuffer();

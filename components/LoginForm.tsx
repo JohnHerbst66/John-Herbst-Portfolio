@@ -1,44 +1,47 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
-export default function AdminLoginForm() {
+export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
 
-    setLoading(false);
-    if (res.ok) {
-      // Store password in sessionStorage so upload form can use it
-      sessionStorage.setItem("admin_password", password);
-      router.push("/admin");
-    } else {
-      const data = await res.json();
+      if (res.ok) {
+        // Full navigation so the server re-reads the new cookie.
+        window.location.href = "/admin";
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
       setError(data.error || "Incorrect password");
+    } catch {
+      setError("Could not reach the server");
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="spec-panel bg-panel border border-panelline rounded p-8 max-w-md"
+      className="spec-panel bg-panel border border-panelline rounded p-8"
     >
-      <h2 className="font-mono text-sm tracking-wider text-blueprint mb-6">
-        // ADMIN ACCESS
-      </h2>
+      <h1 className="font-mono text-sm tracking-wider text-blueprint mb-6">
+        // ADMIN LOGIN
+      </h1>
       <input
         type="password"
         name="password"

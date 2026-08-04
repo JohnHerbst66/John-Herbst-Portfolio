@@ -42,10 +42,16 @@ export default function Footer() {
           linkedin →
         </a>
         <a
-          href="/admin"
+          href="/portfolio"
           className="text-paper hover:text-blueprint transition-colors"
         >
           portfolio →
+        </a>
+        <a
+          href="/login"
+          className="text-muted hover:text-blueprint transition-colors"
+        >
+          admin →
         </a>
       </div>
       <p className="font-mono text-xs text-muted mt-12">

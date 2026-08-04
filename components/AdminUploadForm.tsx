@@ -2,11 +2,7 @@
 
 import { useState } from "react";
 
-interface AdminUploadFormProps {
-  password: string;
-}
-
-export default function AdminUploadForm({ password }: AdminUploadFormProps) {
+export default function AdminUploadForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -31,16 +27,20 @@ export default function AdminUploadForm({ password }: AdminUploadFormProps) {
 
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("password", password);
 
         const res = await fetch("/api/portfolio/upload", {
           method: "POST",
           body: formData,
         });
 
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+
         if (!res.ok) {
-          const data = await res.json();
-          setStatus(`Upload failed: ${data.error}`);
+          const data = await res.json().catch(() => ({}));
+          setStatus(`Upload failed: ${data.error ?? res.statusText}`);
           setUploading(false);
           return;
         }
