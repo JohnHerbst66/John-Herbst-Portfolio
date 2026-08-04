@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { RepoActivity, timeAgo } from "@/lib/github";
 
 export default function Hero({ latest }: { latest: RepoActivity | null }) {
@@ -14,7 +15,14 @@ export default function Hero({ latest }: { latest: RepoActivity | null }) {
         from desktop tools to deployed web apps.
       </p>
 
-      <div className="mt-10 font-mono text-sm bg-panel border border-panelline rounded px-4 py-3 inline-block">
+      <Link
+        href="/files"
+        className="inline-block mt-8 bg-blueprint text-ink font-mono text-sm font-medium rounded px-5 py-3 hover:bg-blueprintdim transition-colors"
+      >
+        view my work →
+      </Link>
+
+      <div className="mt-10 font-mono text-sm bg-panel border border-panelline rounded px-4 py-3 block w-fit">
         {latest ? (
           <span className="text-paper">
             <span className="text-signal">$</span> last push{" "}
