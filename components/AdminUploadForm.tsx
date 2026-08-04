@@ -19,6 +19,19 @@ export default function AdminUploadForm() {
       return;
     }
 
+    // Vercel caps server-side uploads at 4.5 MB. Catch it here so an oversized
+    // file reports its actual size instead of failing opaquely at the edge.
+    const LIMIT = 4.5 * 1024 * 1024;
+    const tooBig = files.filter((f) => f.size > LIMIT);
+    if (tooBig.length > 0) {
+      setStatus(
+        `Too large (4.5 MB limit): ${tooBig
+          .map((f) => `${f.name} is ${(f.size / 1024 / 1024).toFixed(1)} MB`)
+          .join(", ")}`
+      );
+      return;
+    }
+
     setUploading(true);
     try {
       for (let i = 0; i < files.length; i++) {
