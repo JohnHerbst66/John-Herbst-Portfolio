@@ -1,6 +1,7 @@
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { list } from "@vercel/blob";
+import { blobCredentials } from "@/lib/blob";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,7 @@ export default async function FilesPage() {
   let storageError = false;
 
   try {
-    const { blobs } = await list({ prefix: "portfolio/" });
+    const { blobs } = await list({ prefix: "portfolio/", ...blobCredentials() });
     items = blobs
       .map((blob) => ({
         name: blob.pathname.replace(/^portfolio\//, ""),

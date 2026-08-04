@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { SESSION_COOKIE_NAME, verifyToken } from "@/lib/auth";
+import { blobCredentials } from "@/lib/blob";
 
 export async function POST(request: NextRequest) {
   if (!verifyToken(request.cookies.get(SESSION_COOKIE_NAME)?.value)) {
@@ -23,6 +24,7 @@ export async function POST(request: NextRequest) {
     const blob = await put(`portfolio/${file.name}`, await file.arrayBuffer(), {
       access: "public",
       allowOverwrite: true,
+      ...blobCredentials(),
     });
     return NextResponse.json({ ok: true, url: blob.url });
   } catch (err) {
