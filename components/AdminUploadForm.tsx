@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AdminUploadForm() {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
+  const router = useRouter();
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     setFiles(Array.from(e.target.files ?? []));
@@ -61,6 +63,8 @@ export default function AdminUploadForm() {
 
       setStatus(`✓ Uploaded ${files.length} file(s)`);
       setFiles([]);
+      // Re-render the server component so the new files appear in the list.
+      router.refresh();
     } catch (err) {
       setStatus(`Error: ${(err as Error).message}`);
     } finally {
