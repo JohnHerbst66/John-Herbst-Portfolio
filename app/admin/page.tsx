@@ -15,6 +15,12 @@ export default function AdminPage() {
     <main className="min-h-screen flex items-center justify-center px-6">
       <div className="w-full max-w-md space-y-4">
         <AdminUploadForm />
+        <a
+          href="/files"
+          className="block text-center font-mono text-xs text-blueprint hover:underline"
+        >
+          view public files page →
+        </a>
         <LogoutButton />
       </div>
     </main>
