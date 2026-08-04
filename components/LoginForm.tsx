@@ -37,26 +37,18 @@ export default function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      autoComplete="off"
       className="spec-panel bg-panel border border-panelline rounded p-8"
     >
       <h1 className="font-mono text-sm tracking-wider text-blueprint mb-6">
         // ADMIN LOGIN
       </h1>
-      {/*
-        Chrome ignores autoComplete="off" on password fields; "new-password"
-        is the hint it honours, and the non-standard input name stops saved
-        credentials matching this form.
-      */}
       <input
         type="password"
-        name="admin-passphrase"
+        name="password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="password"
         autoFocus
-        autoComplete="new-password"
-        data-form-type="other"
         className="w-full bg-ink border border-panelline rounded px-3 py-2 font-mono text-sm text-paper mb-4 focus:outline-none focus:border-blueprint"
       />
       {error && <p className="font-mono text-xs text-signal mb-4">{error}</p>}
