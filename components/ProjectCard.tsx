@@ -1,4 +1,5 @@
 import { Project } from "@/content/projects";
+import { RepoDetails, timeAgo } from "@/lib/github";
 
 const statusLabel: Record<Project["status"], string> = {
   live: "LIVE",
@@ -12,7 +13,20 @@ const statusColor: Record<Project["status"], string> = {
   pending: "text-muted",
 };
 
-export default function ProjectCard({ project }: { project: Project }) {
+export default function ProjectCard({
+  project,
+  live,
+}: {
+  project: Project;
+  /** Live GitHub data when the project names a repo; null when absent or unreachable. */
+  live?: RepoDetails | null;
+}) {
+  // Prefer what GitHub reports, fall back to the static entry.
+  const tagline = live?.description ?? project.tagline;
+  const stack = live?.languages.length ? live.languages : project.stack;
+  const repoUrl = live?.url ?? project.repoUrl;
+  const demoUrl = live?.homepage ?? project.demoUrl;
+
   return (
     <div className="spec-panel bg-panel border border-panelline rounded p-6 flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">
@@ -29,10 +43,10 @@ export default function ProjectCard({ project }: { project: Project }) {
       <h3 className="font-display font-bold text-xl text-paper mb-1">
         {project.name}
       </h3>
-      <p className="font-body text-muted text-sm mb-4">{project.tagline}</p>
+      <p className="font-body text-muted text-sm mb-4">{tagline}</p>
 
       <div className="flex flex-wrap gap-2 mb-5">
-        {project.stack.map((tech) => (
+        {stack.map((tech) => (
           <span
             key={tech}
             className="font-mono text-xs px-2 py-1 rounded border border-panelline text-blueprint"
@@ -57,10 +71,10 @@ export default function ProjectCard({ project }: { project: Project }) {
         </div>
       </dl>
 
-      <div className="flex gap-4 font-mono text-sm mt-auto">
-        {project.demoUrl && (
+      <div className="flex items-center gap-4 font-mono text-sm mt-auto">
+        {demoUrl && (
           <a
-            href={project.demoUrl}
+            href={demoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-signal hover:underline"
@@ -68,9 +82,9 @@ export default function ProjectCard({ project }: { project: Project }) {
             live demo →
           </a>
         )}
-        {project.repoUrl && (
+        {repoUrl && (
           <a
-            href={project.repoUrl}
+            href={repoUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blueprint hover:underline"
@@ -78,8 +92,13 @@ export default function ProjectCard({ project }: { project: Project }) {
             repo →
           </a>
         )}
-        {!project.demoUrl && !project.repoUrl && (
+        {!demoUrl && !repoUrl && (
           <span className="text-muted">link pending</span>
+        )}
+        {live && (
+          <span className="text-muted text-xs ml-auto">
+            updated {timeAgo(live.pushedAt)}
+          </span>
         )}
       </div>
     </div>

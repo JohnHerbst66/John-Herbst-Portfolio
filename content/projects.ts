@@ -11,6 +11,11 @@ export interface Project {
   demoUrl?: string;
   repoUrl?: string;
   status: ProjectStatus; // "live" = has a working demo, "repo" = code only, "pending" = not pushed yet
+  /**
+   * Repo name under the GitHub account. When set, the card pulls its stack and
+   * tagline live from GitHub, so pushing code updates the site on its own.
+   */
+  githubRepo?: string;
 }
 
 // Add a new object to this array to feature a project. Nothing else needs to change —
@@ -56,13 +61,20 @@ export const projects: Project[] = [
     status: "pending",
   },
   {
-    slug: "mvc-apps",
-    name: "MVC Apps",
-    tagline: "Earlier MVC-pattern projects",
-    stack: ["TBD"], // TODO: fill in real stack once pushed
-    problem: "TODO",
-    approach: "TODO",
-    outcome: "TODO",
-    status: "pending",
+    slug: "koolstoof-delivery",
+    name: "Koolstoof Delivery",
+    // Tagline and stack are overridden live from GitHub — see githubRepo below.
+    tagline:
+      "A .NET Core MVC web app for a local restaurant's delivery service",
+    stack: ["C#", ".NET 10", "ASP.NET Core MVC", "EF Core"],
+    problem:
+      "Koolstoof, a local restaurant, needs a delivery service built around how they actually operate rather than a generic ordering platform.",
+    approach:
+      "An ASP.NET Core MVC application on .NET 10, with Entity Framework Core over SQL Server for the data layer, ASP.NET Core Identity for accounts, and a Dockerfile so it runs the same everywhere.",
+    outcome:
+      "Early days — the project is scaffolded with Identity and the database context in place, and is being actively built out.",
+    repoUrl: "https://github.com/JohnHerbst66/MVC-Koolstoof-Delivery-Web-App",
+    githubRepo: "MVC-Koolstoof-Delivery-Web-App",
+    status: "repo",
   },
 ];
