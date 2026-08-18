@@ -135,19 +135,25 @@ export default function ScrollConstruct() {
     let targetBot = 0;
     let raf = 0;
     let idle: ReturnType<typeof setTimeout> | undefined;
-    let scrolling = false;
+    let animating = false;
 
     const write = () => {
       node.style.setProperty("--d-top", dTop.toFixed(3));
       node.style.setProperty("--d-bot", dBot.toFixed(3));
     };
 
+    // Fraction of the remaining distance covered each frame; lower is slower.
+    // Breaking apart keeps its pace, but settling back is roughly half that
+    // speed so the page reassembles gently once scrolling stops.
+    const EASE_APART = 0.028;
+    const EASE_BACK = 0.0145;
+
+    const approach = (current: number, target: number) =>
+      current + (target - current) * (target > current ? EASE_APART : EASE_BACK);
+
     const tick = () => {
-      // Fraction of the remaining distance covered each frame. Lower is
-      // slower; this settles over roughly a second and a half.
-      const EASE = 0.028;
-      dTop += (targetTop - dTop) * EASE;
-      dBot += (targetBot - dBot) * EASE;
+      dTop = approach(dTop, targetTop);
+      dBot = approach(dBot, targetBot);
       write();
 
       if (
@@ -155,19 +161,25 @@ export default function ScrollConstruct() {
         Math.abs(targetBot - dBot) > 0.002
       ) {
         raf = requestAnimationFrame(tick);
-      } else {
-        dTop = targetTop;
-        dBot = targetBot;
-        write();
-        raf = 0;
+        return;
       }
+
+      dTop = targetTop;
+      dBot = targetBot;
+      write();
+      raf = 0;
+
+      // Only now is it safe to stop the keyframes. Pausing them the moment
+      // scrolling ended would freeze pieces mid-flight in plain sight; by
+      // here the bands have faded to nothing, so nobody sees them halt.
+      if (targetTop === 0 && targetBot === 0) setAnimating(false);
     };
 
-    const setScrolling = (on: boolean) => {
-      if (scrolling === on) return;
-      scrolling = on;
-      // Gates the looping debris keyframes, so pieces are thrown off for the
-      // whole time the page is moving rather than once per direction change.
+    // Gates the looping debris keyframes. Kept running for the whole time any
+    // piece can still be seen, not just while the wheel is turning.
+    const setAnimating = (on: boolean) => {
+      if (animating === on) return;
+      animating = on;
       node.dataset.scrolling = on ? "true" : "false";
     };
 
@@ -178,7 +190,7 @@ export default function ScrollConstruct() {
       if (Math.abs(delta) < 3) return;
       last = y;
 
-      setScrolling(true);
+      setAnimating(true);
 
       // Both edges break open while the page moves; what differs is the
       // direction of travel. Scrolling down, content leaves at the top so its
@@ -194,7 +206,8 @@ export default function ScrollConstruct() {
       // in either direction has something to break apart.
       clearTimeout(idle);
       idle = setTimeout(() => {
-        setScrolling(false);
+        // Only start the fade. The keyframes stay running until the bands
+        // have actually reached zero, which tick() takes care of.
         targetTop = 0;
         targetBot = 0;
         if (!raf) raf = requestAnimationFrame(tick);
@@ -202,7 +215,9 @@ export default function ScrollConstruct() {
     };
 
     write();
-    setScrolling(false);
+    // Set outright rather than via setAnimating, which would no-op here since
+    // the flag already starts false and the attribute would go unwritten.
+    node.dataset.scrolling = "false";
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
