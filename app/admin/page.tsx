@@ -1,11 +1,10 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { list } from "@vercel/blob";
 import AdminUploadForm from "@/components/AdminUploadForm";
-import AdminFileList, { AdminFile } from "@/components/AdminFileList";
+import AdminLibrary from "@/components/AdminLibrary";
 import LogoutButton from "@/components/LogoutButton";
 import { SESSION_COOKIE_NAME, verifyToken } from "@/lib/auth";
-import { blobCredentials } from "@/lib/blob";
+import { getLibrary, type Library } from "@/lib/folders";
 
 export const dynamic = "force-dynamic";
 
@@ -14,35 +13,27 @@ export default async function AdminPage() {
     redirect("/login");
   }
 
-  let files: AdminFile[] = [];
+  let library: Library = { folders: [], uncategorized: [] };
   let storageError = false;
 
   try {
-    const { blobs } = await list({ prefix: "portfolio/", ...blobCredentials() });
-    files = blobs
-      .map((blob) => ({
-        name: blob.pathname.replace(/^portfolio\//, ""),
-        pathname: blob.pathname,
-        url: blob.url,
-        size: blob.size,
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name));
+    library = await getLibrary();
   } catch (err) {
     storageError = true;
-    console.error("Failed to list files for admin:", err);
+    console.error("Failed to load the library:", err);
   }
 
   return (
     <main className="min-h-screen flex items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md space-y-4">
-        <AdminUploadForm />
+      <div className="w-full max-w-2xl space-y-4">
+        <AdminUploadForm folderNames={library.folders.map((f) => f.name)} />
 
         {storageError ? (
           <p className="font-mono text-xs text-signal text-center">
             Couldn&apos;t load the file list.
           </p>
         ) : (
-          <AdminFileList files={files} />
+          <AdminLibrary library={library} />
         )}
 
         <a

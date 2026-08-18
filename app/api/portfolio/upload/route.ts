@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { SESSION_COOKIE_NAME, verifyToken } from "@/lib/auth";
 import { blobCredentials } from "@/lib/blob";
+import { PREFIX, validateFolderName } from "@/lib/folders";
 
 export async function POST(request: NextRequest) {
   if (!verifyToken(request.cookies.get(SESSION_COOKIE_NAME)?.value)) {
@@ -9,9 +10,12 @@ export async function POST(request: NextRequest) {
   }
 
   let file: File | null = null;
+  let rawFolder: string | null = null;
   try {
     const formData = await request.formData();
     file = formData.get("file") as File | null;
+    const folderField = formData.get("folder");
+    rawFolder = typeof folderField === "string" ? folderField : null;
   } catch {
     return NextResponse.json({ error: "Malformed upload" }, { status: 400 });
   }
@@ -20,8 +24,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
+  // Empty means the root; anything else has to be a valid folder name.
+  const folder = rawFolder ? validateFolderName(rawFolder) : null;
+  if (rawFolder && !folder) {
+    return NextResponse.json({ error: "Invalid folder" }, { status: 400 });
+  }
+
+  const destination = folder
+    ? `${PREFIX}${folder}/${file.name}`
+    : `${PREFIX}${file.name}`;
+
   try {
-    const blob = await put(`portfolio/${file.name}`, await file.arrayBuffer(), {
+    const blob = await put(destination, await file.arrayBuffer(), {
       access: "public",
       allowOverwrite: true,
       ...blobCredentials(),

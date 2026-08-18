@@ -29,6 +29,16 @@ function findBySuffix(suffix: string): string | undefined {
   return undefined;
 }
 
+/**
+ * createFolder() accepts only a token — unlike put/list/rename it has no
+ * storeId option — so it needs the credential narrowed to that shape.
+ * Returns undefined when the SDK should fall back to its own env lookup.
+ */
+export function blobToken(): { token: string } | undefined {
+  const credentials = blobCredentials();
+  return "token" in credentials ? { token: credentials.token } : undefined;
+}
+
 export function blobCredentials():
   | { token: string }
   | { storeId: string }

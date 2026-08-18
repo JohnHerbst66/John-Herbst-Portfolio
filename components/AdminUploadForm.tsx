@@ -3,8 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function AdminUploadForm() {
+export default function AdminUploadForm({
+  folderNames = [],
+}: {
+  folderNames?: string[];
+}) {
   const [files, setFiles] = useState<File[]>([]);
+  const [folder, setFolder] = useState("");
   const [uploading, setUploading] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const router = useRouter();
@@ -42,6 +47,7 @@ export default function AdminUploadForm() {
 
         const formData = new FormData();
         formData.append("file", file);
+        if (folder) formData.append("folder", folder);
 
         const res = await fetch("/api/portfolio/upload", {
           method: "POST",
@@ -90,6 +96,26 @@ export default function AdminUploadForm() {
         onChange={handleFileSelect}
         className="w-full mb-4 font-mono text-xs text-muted file:mr-4 file:py-2 file:px-3 file:rounded file:border file:border-panelline file:bg-ink file:text-paper file:font-mono file:text-xs"
       />
+
+      {folderNames.length > 0 && (
+        <>
+          <label className="block font-mono text-xs text-muted mb-2">
+            Upload into
+          </label>
+          <select
+            value={folder}
+            onChange={(e) => setFolder(e.target.value)}
+            className="w-full mb-4 bg-ink border border-panelline rounded px-3 py-2 font-mono text-xs text-paper focus:outline-none focus:border-blueprint"
+          >
+            <option value="">no folder</option>
+            {folderNames.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
 
       {files.length > 0 && (
         <p className="font-mono text-xs text-muted mb-4">

@@ -23,6 +23,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid file" }, { status: 400 });
   }
 
+  // A trailing slash is a folder marker, not a file. Deleting one here would
+  // silently strand the folder — that belongs to the folder delete action.
+  if (pathname.endsWith("/")) {
+    return NextResponse.json(
+      { error: "Use the folder delete action for folders." },
+      { status: 400 }
+    );
+  }
+
   try {
     const creds = blobCredentials();
     const { blobs } = await list({ prefix: PREFIX, ...creds });
