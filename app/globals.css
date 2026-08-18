@@ -80,13 +80,17 @@ body {
 }
 
 /*
-  Scroll-driven construction bands.
+  Edge dispersion.
 
-  JS writes only --a-top and --a-bot (0 = scattered, 1 = assembled) on the
-  layer; every block derives its own transform from that, so a scroll frame is
-  two custom-property writes plus compositor-only transforms rather than 32
-  style writes. Only transform and opacity change - nothing here triggers
-  layout.
+  Rasterising live text into particles would need a canvas capture every
+  frame, which wrecks scroll performance and loses text selection. Instead a
+  grid of cells painted in the page background fades in over the content near
+  each edge, eating it square by square, while coloured debris flies outward
+  from that boundary. Only opacity and transform change.
+
+  JS writes --d-top and --d-bot (0 = intact, 1 = broken apart); every cell
+  compares its own --threshold against that, so a frame is two custom
+  property writes.
 */
 .construct-layer {
   position: fixed;
@@ -94,71 +98,95 @@ body {
   pointer-events: none;
   z-index: 30;
   overflow: hidden;
-  --a-top: 0;
-  --a-bot: 1;
+  --d-top: 0;
+  --d-bot: 0;
+  --cell: 34px;
 }
 .construct-band {
   position: absolute;
   left: 0;
   right: 0;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+  height: calc(var(--cell) * 3);
 }
 .construct-band-top {
   top: 0;
-  --a: var(--a-top);
-  -webkit-mask-image: linear-gradient(to bottom, black 35%, transparent);
-  mask-image: linear-gradient(to bottom, black 35%, transparent);
+  --d: var(--d-top);
 }
 .construct-band-bottom {
   bottom: 0;
-  --a: var(--a-bot);
-  -webkit-mask-image: linear-gradient(to top, black 35%, transparent);
-  mask-image: linear-gradient(to top, black 35%, transparent);
+  --d: var(--d-bot);
 }
-.construct-block {
-  --travel: 1;
-  --size-base: 14px;
+.construct-grid {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+}
+/*
+  Each cell crosses its own threshold at a different point, so the page comes
+  apart square by square rather than all at once.
+*/
+.construct-cell {
+  background-color: #14181D;
+  opacity: clamp(0, calc((var(--d) - var(--threshold)) * 6), 1);
+}
+.construct-debris {
+  position: absolute;
+  top: 50%;
+  --size-base: 24px;
   --size-scale: 1;
   width: calc(var(--size-base) * var(--size-scale));
   height: calc(var(--size-base) * var(--size-scale));
-  flex: 0 0 auto;
   border: 1px solid currentColor;
+  --p: clamp(0, calc((var(--d) - var(--threshold)) * 2.2), 1);
   transform:
     translate3d(
-      calc(var(--dx) * (1 - var(--a)) * var(--travel) * 1px),
-      calc(var(--dy) * (1 - var(--a)) * var(--travel) * 1px),
+      calc(var(--dx) * var(--p) * 1px),
+      calc(var(--dy) * var(--p) * 1px),
       0
     )
-    rotate(calc(var(--rot) * (1 - var(--a)) * 1deg))
-    scale(calc(0.4 + 0.6 * var(--a)));
-  opacity: calc(0.3 + 0.7 * var(--a));
+    rotate(calc(var(--rot) * var(--p) * 1deg))
+    scale(calc(1 - 0.45 * var(--p)));
+  /* Visible only while in flight: absent when whole, gone once thrown clear. */
+  opacity: calc(var(--p) * (1 - var(--p)) * 3.4);
 }
-.construct-block-solid {
+.construct-solid {
   background-color: currentColor;
 }
-/* Fewer blocks and shorter throw on small screens. */
 @media (max-width: 767px) {
-  .construct-band {
-    height: 56px;
+  .construct-layer {
+    --cell: 24px;
   }
-  .construct-block {
-    --travel: 0.6;
-    --size-scale: 0.55;
+  /*
+    Sixteen columns instead of thirty-two. At 375px the full count renders
+    12px-wide stripes rather than blocks. The hidden cells are removed from
+    layout, so no stray tracks are created for them.
+  */
+  .construct-grid {
+    grid-template-columns: repeat(16, 1fr);
   }
-  .construct-block:nth-child(2n) {
+  .construct-cell-wide {
+    display: none;
+  }
+  .construct-debris {
+    --size-scale: 0.6;
+  }
+  /* Thin the debris out; the eraser grid still covers edge to edge. */
+  .construct-debris:nth-of-type(2n) {
     display: none;
   }
 }
 
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
-  /* Sit still, fully built. */
+  /*
+    Nothing comes apart. --d already defaults to 0 and the scroll listener
+    never attaches, so this only needs to guarantee it stays there.
+  */
   .construct-layer {
-    --a-top: 1;
-    --a-bot: 1;
+    --d-top: 0;
+    --d-bot: 0;
   }
   .cursor::after {
     animation: none;
