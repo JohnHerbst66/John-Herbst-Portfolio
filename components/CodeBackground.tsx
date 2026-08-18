@@ -134,7 +134,7 @@ export default function CodeBackground() {
       className="hidden md:block pointer-events-none select-none absolute inset-0 overflow-hidden"
     >
       <pre
-        className="absolute right-0 top-0 h-full font-mono text-xs leading-6 text-blueprint whitespace-pre text-right opacity-[0.35] m-0 pr-2"
+        className="absolute right-0 top-0 h-full font-mono text-xs leading-6 text-blueprint whitespace-pre text-right opacity-[0.5] m-0 pr-2"
         style={{
           // Fade the edges so the block never collides with the headline.
           maskImage:
