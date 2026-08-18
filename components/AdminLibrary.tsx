@@ -22,9 +22,28 @@ export default function AdminLibrary({ library }: { library: Library }) {
   const [confirmText, setConfirmText] = useState("");
   const [deletingFile, setDeletingFile] = useState<string | null>(null);
 
-  const folderNames = library.folders.map((f) => f.name);
+  // The saved order lives in a blob behind a CDN, so re-reading it straight
+  // after a write can briefly return the previous order. Hold the intended
+  // order locally so reordering looks immediate regardless of that lag.
+  const [pendingOrder, setPendingOrder] = useState<string[] | null>(null);
 
-  async function call(url: string, payload: unknown): Promise<boolean> {
+  const orderedFolders = pendingOrder
+    ? [...library.folders].sort((a, b) => {
+        const rank = (name: string) => {
+          const i = pendingOrder.indexOf(name);
+          return i === -1 ? Number.MAX_SAFE_INTEGER : i;
+        };
+        return rank(a.name) - rank(b.name);
+      })
+    : library.folders;
+
+  const folderNames = orderedFolders.map((f) => f.name);
+
+  async function call(
+    url: string,
+    payload: unknown,
+    refresh = true
+  ): Promise<boolean> {
     setBusy(true);
     setError(null);
     try {
@@ -43,7 +62,7 @@ export default function AdminLibrary({ library }: { library: Library }) {
         setError(data.error ?? "Something went wrong");
         return false;
       }
-      router.refresh();
+      if (refresh) router.refresh();
       return true;
     } catch {
       setError("Could not reach the server");
@@ -63,17 +82,17 @@ export default function AdminLibrary({ library }: { library: Library }) {
     }
   }
 
-  async function move(order: string[]) {
-    await call(folders, { action: "reorder", order });
-  }
-
   function shift(name: string, delta: number) {
     const next = [...folderNames];
     const i = next.indexOf(name);
     const j = i + delta;
     if (i === -1 || j < 0 || j >= next.length) return;
+
     [next[i], next[j]] = [next[j], next[i]];
-    void move(next);
+    setPendingOrder(next);
+    // No refresh: re-reading the server order here could show the pre-write
+    // value and undo what the user just did on screen.
+    void call(folders, { action: "reorder", order: next }, false);
   }
 
   return (
@@ -105,7 +124,7 @@ export default function AdminLibrary({ library }: { library: Library }) {
       )}
 
       <div className="space-y-4 font-mono text-xs">
-        {library.folders.map((folder, index) => (
+        {orderedFolders.map((folder, index) => (
           <div key={folder.name} className="border border-panelline rounded">
             <div className="flex items-center gap-2 px-3 py-2 bg-ink/40">
               <div className="flex flex-col leading-none">
@@ -119,7 +138,7 @@ export default function AdminLibrary({ library }: { library: Library }) {
                 </button>
                 <button
                   onClick={() => shift(folder.name, 1)}
-                  disabled={busy || index === library.folders.length - 1}
+                  disabled={busy || index === orderedFolders.length - 1}
                   title="Move down"
                   className="text-muted hover:text-blueprint disabled:opacity-20"
                 >

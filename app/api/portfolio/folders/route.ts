@@ -119,7 +119,9 @@ export async function POST(request: NextRequest) {
       const remaining = (await existingFolderNames()).filter((n) => n !== name);
       await writeOrder(remaining);
 
-      return NextResponse.json({ ok: true, deleted: name, files: blobs.length });
+      // Exclude the folder marker so the count reflects real files.
+      const fileCount = blobs.filter((b) => !b.pathname.endsWith("/")).length;
+      return NextResponse.json({ ok: true, deleted: name, files: fileCount });
     }
 
     /* ---------- reorder ---------- */
