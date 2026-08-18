@@ -119,9 +119,10 @@ export default function ScrollConstruct() {
     };
 
     const tick = () => {
-      // Eased rather than snapped, so pieces settle in sequence instead of
-      // arriving together.
-      const EASE = 0.085;
+      // Fraction of the remaining distance covered each frame. Lower is
+      // slower: at 60fps this settles over roughly 1.7s, where 0.085 got
+      // there in about half a second and read as a snap.
+      const EASE = 0.028;
       dTop += (targetTop - dTop) * EASE;
       dBot += (targetBot - dBot) * EASE;
       write();
