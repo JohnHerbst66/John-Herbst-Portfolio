@@ -51,16 +51,6 @@ export const projects: Project[] = [
     status: "repo",
   },
   {
-    slug: "login-test-app",
-    name: "Login Test App",
-    tagline: "A sandbox app for testing and debugging auth flows",
-    stack: ["TBD"], // TODO: fill in real stack once pushed
-    problem: "TODO",
-    approach: "TODO",
-    outcome: "TODO",
-    status: "pending",
-  },
-  {
     slug: "koolstoof-delivery",
     name: "Koolstoof Delivery",
     // Tagline and stack are overridden live from GitHub — see githubRepo below.
