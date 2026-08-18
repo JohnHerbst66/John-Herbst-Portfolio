@@ -79,8 +79,83 @@ body {
   animation-play-state: paused;
 }
 
+/*
+  Scroll-driven construction bands.
+
+  JS writes only --a-top and --a-bot (0 = scattered, 1 = assembled) on the
+  layer; every block derives its own transform from that, so a scroll frame is
+  two custom-property writes plus compositor-only transforms rather than 32
+  style writes. Only transform and opacity change - nothing here triggers
+  layout.
+*/
+.construct-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 30;
+  overflow: hidden;
+  --a-top: 0;
+  --a-bot: 1;
+}
+.construct-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.construct-band-top {
+  top: 0;
+  --a: var(--a-top);
+  -webkit-mask-image: linear-gradient(to bottom, black 35%, transparent);
+  mask-image: linear-gradient(to bottom, black 35%, transparent);
+}
+.construct-band-bottom {
+  bottom: 0;
+  --a: var(--a-bot);
+  -webkit-mask-image: linear-gradient(to top, black 35%, transparent);
+  mask-image: linear-gradient(to top, black 35%, transparent);
+}
+.construct-block {
+  --travel: 1;
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+  transform:
+    translate3d(
+      calc(var(--dx) * (1 - var(--a)) * var(--travel) * 1px),
+      calc(var(--dy) * (1 - var(--a)) * var(--travel) * 1px),
+      0
+    )
+    rotate(calc(var(--rot) * (1 - var(--a)) * 1deg))
+    scale(calc(0.55 + 0.45 * var(--a)));
+  opacity: calc(0.12 + 0.68 * var(--a));
+}
+/* Fewer blocks and shorter throw on small screens. */
+@media (max-width: 767px) {
+  .construct-band {
+    height: 56px;
+  }
+  .construct-block {
+    --travel: 0.55;
+    width: 10px;
+    height: 10px;
+  }
+  .construct-block:nth-child(2n) {
+    display: none;
+  }
+}
+
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
+  /* Sit still, fully built. */
+  .construct-layer {
+    --a-top: 1;
+    --a-bot: 1;
+  }
   .cursor::after {
     animation: none;
   }
