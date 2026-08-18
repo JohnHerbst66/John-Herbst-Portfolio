@@ -7,8 +7,12 @@ const COLS = 32;
 const ROWS = 3;
 /** Pieces in flight at each edge. Each loops on its own cycle. */
 const DEBRIS = 30;
-/** How long after the last scroll event the page counts as still. */
-const IDLE_MS = 140;
+/**
+ * How long after the last scroll event the page counts as still. Pieces keep
+ * flying and the edges stay open for this long once scrolling stops, so the
+ * effect trails off rather than cutting out the moment the wheel does.
+ */
+const IDLE_MS = 500;
 
 /**
  * Deterministic pseudo-random in 0..1.
