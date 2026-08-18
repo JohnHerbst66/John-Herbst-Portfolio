@@ -9,7 +9,8 @@ export default function Nav() {
       >
         JOHN HERBST
       </Link>
-      <nav className="flex gap-6 font-mono text-sm text-muted">
+      {/* Wraps and tightens on small screens; five links at gap-6 overflowed 375px. */}
+      <nav className="flex flex-wrap justify-end gap-x-4 gap-y-1 sm:gap-x-6 font-mono text-sm text-muted">
         {/*
           Root-relative so these still work off the home page — a bare
           "#builds" points at nothing on /files.

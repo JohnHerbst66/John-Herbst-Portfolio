@@ -17,13 +17,14 @@ export default async function FeaturedProjects() {
       <h2 className="font-mono text-sm tracking-wider text-blueprint mb-8">
         // FEATURED BUILDS
       </h2>
+      {/*
+        min-w-0 on each grid item: a grid item defaults to min-width:auto, so
+        the wide screenshot track stretches the card past the grid and scrolls
+        the whole page sideways.
+      */}
       <div className="grid md:grid-cols-2 gap-6">
         {projects.map((project, i) => (
-          <Reveal
-            key={project.slug}
-            delay={i * 90}
-            className={project.screenshots?.length ? "md:col-span-2" : ""}
-          >
+          <Reveal key={project.slug} delay={i * 90} className="min-w-0">
             <ProjectCard project={project} live={live[i]} />
           </Reveal>
         ))}

@@ -58,10 +58,38 @@ body {
   50% { opacity: 0; }
 }
 
+/*
+  Continuously scrolling screenshot strip. The track holds the images twice
+  over and slides exactly half its width, so the seam never shows. Driven by
+  CSS rather than a timer because browsers throttle timers in background tabs,
+  which stalls a JS-driven carousel.
+*/
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 45s) linear infinite;
+  will-change: transform;
+}
+/* Hold still while it is being looked at, or while a shot is open. */
+.marquee-viewport:hover .marquee-track,
+.marquee-viewport:focus-within .marquee-track,
+.marquee-track[data-paused="true"] {
+  animation-play-state: paused;
+}
+
 /* Respect reduced-motion preference */
 @media (prefers-reduced-motion: reduce) {
   .cursor::after {
     animation: none;
+  }
+  /* No drifting; the strip becomes a plain scrollable row instead. */
+  .marquee-track {
+    animation: none;
+  }
+  .marquee-viewport {
+    overflow-x: auto;
   }
 }
 

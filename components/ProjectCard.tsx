@@ -31,7 +31,7 @@ export default function ProjectCard({
   // The Reveal wrapper in FeaturedProjects owns the grid span, since it is the
   // actual grid child.
   return (
-    <div className="spec-panel bg-panel border border-panelline rounded p-6 flex flex-col h-full">
+    <div className="spec-panel bg-panel border border-panelline rounded p-6 flex flex-col h-full min-w-0">
       <div className="flex items-center justify-between mb-2">
         <span className="font-mono text-xs tracking-wider text-muted">
           FIG — {project.slug.toUpperCase()}
