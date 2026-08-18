@@ -64,17 +64,32 @@ export async function POST(request: NextRequest) {
         return bad(`A folder called "${to}" already exists.`);
       }
 
-      // Blob has no folder rename, so every blob under the old prefix moves
-      // individually. The marker moves too, so an empty folder survives.
-      const { blobs } = await list({ prefix: `${PREFIX}${from}/`, ...creds });
+      // Blob has no folder rename, so every file under the old prefix moves
+      // individually. The marker is deliberately skipped: its pathname ends in
+      // "/" and rename() rejects that with "Missing filename in pathname", so
+      // the destination marker is created fresh and the old one deleted. That
+      // also keeps an empty folder alive across a rename.
+      const oldPrefix = `${PREFIX}${from}/`;
+      const { blobs } = await list({ prefix: oldPrefix, ...creds });
+
       for (const blob of blobs) {
-        const tail = blob.pathname.slice(`${PREFIX}${from}/`.length);
+        if (blob.pathname.endsWith("/")) continue;
+        const tail = blob.pathname.slice(oldPrefix.length);
         await rename(blob.pathname, `${PREFIX}${to}/${tail}`, {
           access: "public",
           ...creds,
         });
       }
+
       await createFolder(folderMarker(to), blobToken());
+
+      const markers = blobs.filter((b) => b.pathname.endsWith("/"));
+      if (markers.length > 0) {
+        await del(
+          markers.map((m) => m.url),
+          creds
+        );
+      }
 
       const order = await existingFolderNames();
       await writeOrder(order.map((n) => (n === from ? to : n)));
