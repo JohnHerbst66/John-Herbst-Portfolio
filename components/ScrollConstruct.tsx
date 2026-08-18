@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const BLOCKS = 16;
+const BLOCKS = 30;
 
 /**
  * Deterministic pseudo-random in 0..1.
@@ -17,27 +17,41 @@ function noise(i: number, salt: number): number {
 
 function blocks(band: number) {
   return Array.from({ length: BLOCKS }, (_, i) => {
-    const dx = Math.round((noise(i, band + 1) - 0.5) * 260);
-    const dy = Math.round((noise(i, band + 7) - 0.5) * 180);
-    const rot = Math.round((noise(i, band + 13) - 0.5) * 180);
+    // Scatter on a circle rather than a box, so blocks converge from every
+    // angle instead of drifting in along two axes.
+    const angle = noise(i, band + 1) * Math.PI * 2;
+    const distance = 150 + noise(i, band + 5) * 260;
+    const dx = Math.round(Math.cos(angle) * distance);
+    const dy = Math.round(Math.sin(angle) * distance);
+
+    // Up to a turn and a half, either way.
+    const rot = Math.round((noise(i, band + 13) - 0.5) * 1080);
+    const size = 10 + Math.round(noise(i, band + 17) * 12);
+
     // A few picked out in the accent colours so it reads as structure
     // rather than confetti.
     const tone =
-      noise(i, band + 21) > 0.86
+      noise(i, band + 21) > 0.82
         ? "text-signal"
-        : noise(i, band + 29) > 0.55
+        : noise(i, band + 29) > 0.45
           ? "text-blueprint"
-          : "text-panelline";
+          : "text-muted";
+
+    // Roughly a third solid, for weight against the outlined ones.
+    const solid = noise(i, band + 37) > 0.66;
 
     return (
       <span
         key={i}
-        className={`construct-block ${tone}`}
+        className={`construct-block ${tone}${solid ? " construct-block-solid" : ""}`}
         style={
           {
             "--dx": dx,
             "--dy": dy,
             "--rot": rot,
+            // Base only. The media query scales it, and an inline --size
+            // would outrank that.
+            "--size-base": `${size}px`,
           } as React.CSSProperties
         }
       />

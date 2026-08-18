@@ -120,8 +120,10 @@ body {
 }
 .construct-block {
   --travel: 1;
-  width: 14px;
-  height: 14px;
+  --size-base: 14px;
+  --size-scale: 1;
+  width: calc(var(--size-base) * var(--size-scale));
+  height: calc(var(--size-base) * var(--size-scale));
   flex: 0 0 auto;
   border: 1px solid currentColor;
   transform:
@@ -131,8 +133,11 @@ body {
       0
     )
     rotate(calc(var(--rot) * (1 - var(--a)) * 1deg))
-    scale(calc(0.55 + 0.45 * var(--a)));
-  opacity: calc(0.12 + 0.68 * var(--a));
+    scale(calc(0.4 + 0.6 * var(--a)));
+  opacity: calc(0.3 + 0.7 * var(--a));
+}
+.construct-block-solid {
+  background-color: currentColor;
 }
 /* Fewer blocks and shorter throw on small screens. */
 @media (max-width: 767px) {
@@ -140,9 +145,8 @@ body {
     height: 56px;
   }
   .construct-block {
-    --travel: 0.55;
-    width: 10px;
-    height: 10px;
+    --travel: 0.6;
+    --size-scale: 0.55;
   }
   .construct-block:nth-child(2n) {
     display: none;
