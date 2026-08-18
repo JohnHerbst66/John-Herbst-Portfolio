@@ -5,8 +5,10 @@ import { useEffect, useRef } from "react";
 /** Eraser grid. Cells nearest the screen edge break away first. */
 const COLS = 32;
 const ROWS = 3;
-/** Coloured pieces that fly off once a band starts coming apart. */
-const DEBRIS = 14;
+/** Pieces thrown off the broken edge. Each loops on its own cycle. */
+const DEBRIS = 16;
+/** How long after the last scroll event the page counts as still. */
+const IDLE_MS = 140;
 
 /**
  * Deterministic pseudo-random in 0..1.
@@ -39,8 +41,7 @@ function eraser(band: number) {
         <span
           key={i}
           // Half the columns drop out on small screens, where 32 across
-          // would render thin stripes rather than blocks. Hidden cells leave
-          // the grid entirely, so the remaining 16 stretch edge to edge.
+          // would render thin stripes rather than blocks.
           className={`construct-cell${c >= COLS / 2 ? " construct-cell-wide" : ""}`}
           style={
             {
@@ -57,17 +58,29 @@ function eraser(band: number) {
   return cells;
 }
 
-/** The pieces that actually fly away. */
+/**
+ * The pieces that fly away. Each runs its own looping keyframe so they keep
+ * being thrown off for as long as scrolling continues, rather than making a
+ * single trip and stopping.
+ *
+ * The outer slot carries the band's dissolve amount, so only the edge that is
+ * actually breaking apart shows its debris; nesting means the two opacities
+ * multiply without the keyframes needing to know about the band.
+ */
 function debris(band: number) {
   return Array.from({ length: DEBRIS }, (_, i) => {
     const angle = noise(i, band + 11) * Math.PI * 2;
-    const distance = 90 + noise(i, band + 17) * 200;
+    const distance = 110 + noise(i, band + 17) * 220;
     const dx = Math.round(Math.cos(angle) * distance);
     // Bias away from the content: the top band throws upward, the bottom down.
     const dy =
       Math.round(Math.abs(Math.sin(angle)) * distance) * (band === 0 ? -1 : 1);
     const rot = Math.round((noise(i, band + 23) - 0.5) * 900);
     const size = 18 + Math.round(noise(i, band + 29) * 20);
+    const duration = 1.9 + noise(i, band + 47) * 2.2;
+    // Negative delay starts each piece part-way through, so they are spread
+    // across the cycle from the first frame instead of launching together.
+    const delay = -(noise(i, band + 53) * duration);
     const tone =
       noise(i, band + 31) > 0.8
         ? "text-signal"
@@ -79,18 +92,23 @@ function debris(band: number) {
     return (
       <span
         key={i}
-        className={`construct-debris ${tone}${solid ? " construct-solid" : ""}`}
-        style={
-          {
-            "--dx": dx,
-            "--dy": dy,
-            "--rot": rot,
-            "--threshold": (noise(i, band + 43) * 0.5).toFixed(3),
-            "--size-base": `${size}px`,
-            left: `${((i + 0.5) / DEBRIS) * 100}%`,
-          } as React.CSSProperties
-        }
-      />
+        className="construct-slot"
+        style={{ left: `${((i + 0.5) / DEBRIS) * 100}%` }}
+      >
+        <span
+          className={`construct-debris ${tone}${solid ? " construct-solid" : ""}`}
+          style={
+            {
+              "--dx": dx,
+              "--dy": dy,
+              "--rot": rot,
+              "--dur": `${duration.toFixed(2)}s`,
+              "--delay": `${delay.toFixed(2)}s`,
+              "--size-base": `${size}px`,
+            } as React.CSSProperties
+          }
+        />
+      </span>
     );
   });
 }
@@ -112,6 +130,8 @@ export default function ScrollConstruct() {
     let targetTop = 0;
     let targetBot = 0;
     let raf = 0;
+    let idle: ReturnType<typeof setTimeout> | undefined;
+    let scrolling = false;
 
     const write = () => {
       node.style.setProperty("--d-top", dTop.toFixed(3));
@@ -120,8 +140,7 @@ export default function ScrollConstruct() {
 
     const tick = () => {
       // Fraction of the remaining distance covered each frame. Lower is
-      // slower: at 60fps this settles over roughly 1.7s, where 0.085 got
-      // there in about half a second and read as a snap.
+      // slower; this settles over roughly a second and a half.
       const EASE = 0.028;
       dTop += (targetTop - dTop) * EASE;
       dBot += (targetBot - dBot) * EASE;
@@ -140,6 +159,14 @@ export default function ScrollConstruct() {
       }
     };
 
+    const setScrolling = (on: boolean) => {
+      if (scrolling === on) return;
+      scrolling = on;
+      // Gates the looping debris keyframes, so pieces are thrown off for the
+      // whole time the page is moving rather than once per direction change.
+      node.dataset.scrolling = on ? "true" : "false";
+    };
+
     const onScroll = () => {
       const y = window.scrollY;
       const delta = y - last;
@@ -147,7 +174,9 @@ export default function ScrollConstruct() {
       if (Math.abs(delta) < 3) return;
       last = y;
 
-      // The trailing edge comes apart, the leading edge builds back. Scrolling
+      setScrolling(true);
+
+      // The trailing edge comes apart, the leading edge stays whole. Scrolling
       // down, content leaves at the top and arrives at the bottom.
       if (delta > 0) {
         targetTop = 1;
@@ -158,13 +187,25 @@ export default function ScrollConstruct() {
       }
 
       if (!raf) raf = requestAnimationFrame(tick);
+
+      // Once the page is still again everything rebuilds, so the next scroll
+      // in either direction has something to break apart.
+      clearTimeout(idle);
+      idle = setTimeout(() => {
+        setScrolling(false);
+        targetTop = 0;
+        targetBot = 0;
+        if (!raf) raf = requestAnimationFrame(tick);
+      }, IDLE_MS);
     };
 
     write();
+    setScrolling(false);
     window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
       if (raf) cancelAnimationFrame(raf);
+      clearTimeout(idle);
       window.removeEventListener("scroll", onScroll);
     };
   }, []);
