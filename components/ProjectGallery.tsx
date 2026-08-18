@@ -111,7 +111,7 @@ export default function ProjectGallery({
           className="fixed inset-0 z-50 bg-ink/95 flex flex-col items-center justify-center p-4 cursor-zoom-out"
         >
           <div
-            className="w-[95vw] max-w-[1200px]"
+            className="w-[92vw] max-w-[820px]"
             onClick={(e) => e.stopPropagation()}
           >
             <Image

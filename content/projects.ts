@@ -43,6 +43,14 @@ export const projects: Project[] = [
     demoUrl: "https://spy-agency-app.onrender.com",
     repoUrl: "https://github.com/JohnHerbst66/spy-agency-app",
     status: "live",
+    screenshots: [
+      { src: "/screenshots/spy-agency/home.png", caption: "Home terminal" },
+      { src: "/screenshots/spy-agency/register.png", caption: "Registering an agent" },
+      { src: "/screenshots/spy-agency/agent-roster.png", caption: "Classified agent roster" },
+      { src: "/screenshots/spy-agency/agent-profile.png", caption: "Agent profile" },
+      { src: "/screenshots/spy-agency/edit-credentials.png", caption: "Editing credentials" },
+      { src: "/screenshots/spy-agency/mission-briefing.png", caption: "Mission briefing" },
+    ],
   },
   {
     slug: "slip-management",
@@ -60,6 +68,8 @@ export const projects: Project[] = [
     screenshots: [
       { src: "/screenshots/slip-management/main-page.png", caption: "Main dashboard with the daily summary" },
       { src: "/screenshots/slip-management/create-a-slip.png", caption: "Creating a slip" },
+      { src: "/screenshots/slip-management/slip-history.png", caption: "Slip history" },
+      { src: "/screenshots/slip-management/slip-tile-editor.png", caption: "Tile display editor" },
       { src: "/screenshots/slip-management/customize-slip-slip-design.png", caption: "Slip design customisation" },
       { src: "/screenshots/slip-management/customize-slip-field-setup.png", caption: "Configurable slip fields" },
       { src: "/screenshots/slip-management/lookup.png", caption: "Managing lookup lists" },
