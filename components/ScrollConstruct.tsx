@@ -5,8 +5,8 @@ import { useEffect, useRef } from "react";
 /** Eraser grid. Cells nearest the screen edge break away first. */
 const COLS = 32;
 const ROWS = 3;
-/** Pieces thrown off the broken edge. Each loops on its own cycle. */
-const DEBRIS = 16;
+/** Pieces in flight at each edge. Each loops on its own cycle. */
+const DEBRIS = 30;
 /** How long after the last scroll event the page counts as still. */
 const IDLE_MS = 140;
 
@@ -77,7 +77,7 @@ function debris(band: number) {
       Math.round(Math.abs(Math.sin(angle)) * distance) * (band === 0 ? -1 : 1);
     const rot = Math.round((noise(i, band + 23) - 0.5) * 900);
     const size = 18 + Math.round(noise(i, band + 29) * 20);
-    const duration = 1.9 + noise(i, band + 47) * 2.2;
+    const duration = 0.85 + noise(i, band + 47) * 1.05;
     // Negative delay starts each piece part-way through, so they are spread
     // across the cycle from the first frame instead of launching together.
     const delay = -(noise(i, band + 53) * duration);
@@ -176,15 +176,13 @@ export default function ScrollConstruct() {
 
       setScrolling(true);
 
-      // The trailing edge comes apart, the leading edge stays whole. Scrolling
-      // down, content leaves at the top and arrives at the bottom.
-      if (delta > 0) {
-        targetTop = 1;
-        targetBot = 0;
-      } else {
-        targetTop = 0;
-        targetBot = 1;
-      }
+      // Both edges break open while the page moves; what differs is the
+      // direction of travel. Scrolling down, content leaves at the top so its
+      // pieces are thrown clear, and arrives at the bottom so those pieces fly
+      // inward and land. The CSS reads this to reverse the arriving edge.
+      node.dataset.dir = delta > 0 ? "down" : "up";
+      targetTop = 1;
+      targetBot = 1;
 
       if (!raf) raf = requestAnimationFrame(tick);
 

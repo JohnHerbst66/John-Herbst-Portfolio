@@ -182,6 +182,15 @@ body {
 .construct-layer[data-scrolling="true"] .construct-debris {
   animation-play-state: running;
 }
+/*
+  The edge content is arriving at plays the same flight backwards, so its
+  pieces come in from off-screen and land in place instead of being thrown
+  clear. Scrolling down that is the bottom; scrolling up, the top.
+*/
+.construct-layer[data-dir="down"] .construct-band-bottom .construct-debris,
+.construct-layer[data-dir="up"] .construct-band-top .construct-debris {
+  animation-direction: reverse;
+}
 .construct-solid {
   background-color: currentColor;
 }
