@@ -1,5 +1,11 @@
 export type ProjectStatus = "live" | "repo" | "pending";
 
+export interface Screenshot {
+  /** Path under /public. */
+  src: string;
+  caption: string;
+}
+
 export interface Project {
   slug: string;
   name: string;
@@ -16,6 +22,8 @@ export interface Project {
    * tagline live from GitHub, so pushing code updates the site on its own.
    */
   githubRepo?: string;
+  /** Screenshots shown as a slider on the card. */
+  screenshots?: Screenshot[];
 }
 
 // Add a new object to this array to feature a project. Nothing else needs to change —
@@ -49,6 +57,17 @@ export const projects: Project[] = [
       "An actively evolving system — recent updates added truck registration enforcement and refined the print workflow based on real usage.",
     repoUrl: "https://github.com/JohnHerbst66/SlipManagement2",
     status: "repo",
+    screenshots: [
+      { src: "/screenshots/slip-management/main-page.png", caption: "Main dashboard with the daily summary" },
+      { src: "/screenshots/slip-management/create-a-slip.png", caption: "Creating a slip" },
+      { src: "/screenshots/slip-management/customize-slip-slip-design.png", caption: "Slip design customisation" },
+      { src: "/screenshots/slip-management/customize-slip-field-setup.png", caption: "Configurable slip fields" },
+      { src: "/screenshots/slip-management/lookup.png", caption: "Managing lookup lists" },
+      { src: "/screenshots/slip-management/printer-settings.png", caption: "Named printer preferences" },
+      { src: "/screenshots/slip-management/calibration-page.png", caption: "Print calibration" },
+      { src: "/screenshots/slip-management/backup.png", caption: "Backups" },
+      { src: "/screenshots/slip-management/backup-restore.png", caption: "Restoring from a backup" },
+    ],
   },
   {
     slug: "koolstoof-delivery",

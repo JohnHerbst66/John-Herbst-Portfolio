@@ -1,4 +1,5 @@
 import { Project } from "@/content/projects";
+import ProjectGallery from "./ProjectGallery";
 import { RepoDetails, timeAgo } from "@/lib/github";
 
 const statusLabel: Record<Project["status"], string> = {
@@ -44,6 +45,10 @@ export default function ProjectCard({
         {project.name}
       </h3>
       <p className="font-body text-muted text-sm mb-4">{tagline}</p>
+
+      {project.screenshots && project.screenshots.length > 0 && (
+        <ProjectGallery shots={project.screenshots} label={project.name} />
+      )}
 
       <div className="flex flex-wrap gap-2 mb-5">
         {stack.map((tech) => (
