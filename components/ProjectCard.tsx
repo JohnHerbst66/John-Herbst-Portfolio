@@ -28,6 +28,8 @@ export default function ProjectCard({
   const repoUrl = live?.url ?? project.repoUrl;
   const demoUrl = live?.homepage ?? project.demoUrl;
 
+  // The Reveal wrapper in FeaturedProjects owns the grid span, since it is the
+  // actual grid child.
   return (
     <div className="spec-panel bg-panel border border-panelline rounded p-6 flex flex-col h-full">
       <div className="flex items-center justify-between mb-2">

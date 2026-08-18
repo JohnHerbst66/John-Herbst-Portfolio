@@ -1,8 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Screenshot } from "@/content/projects";
+
+/** How long a slide rests before the carousel moves on by itself. */
+const AUTOPLAY_MS = 30_000;
+/** Slides further than this from the centre are not rendered. */
+const SPREAD = 2;
 
 export default function ProjectGallery({
   shots,
@@ -13,14 +18,24 @@ export default function ProjectGallery({
 }) {
   const [index, setIndex] = useState(0);
   const [zoomed, setZoomed] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const timer = useRef<ReturnType<typeof setInterval>>();
 
   const go = useCallback(
-    (delta: number) => setIndex((i) => (i + delta + shots.length) % shots.length),
+    (delta: number) =>
+      setIndex((i) => (i + delta + shots.length) % shots.length),
     [shots.length]
   );
 
-  // Arrow keys and Escape only while the full-size view is open, so the
-  // gallery never swallows keys meant for the page.
+  useEffect(() => {
+    // Auto-advance is motion nobody asked for, so honour the preference.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (reduced.matches || paused || zoomed || shots.length < 2) return;
+
+    timer.current = setInterval(() => go(1), AUTOPLAY_MS);
+    return () => clearInterval(timer.current);
+  }, [go, paused, zoomed, shots.length]);
+
   useEffect(() => {
     if (!zoomed) return;
 
@@ -43,32 +58,80 @@ export default function ProjectGallery({
   if (shots.length === 0) return null;
   const current = shots[index];
 
+  /** Shortest signed distance from the centre, so the ring wraps both ways. */
+  const offsetOf = (i: number) => {
+    let offset = i - index;
+    if (offset > shots.length / 2) offset -= shots.length;
+    if (offset < -shots.length / 2) offset += shots.length;
+    return offset;
+  };
+
   return (
     <>
-      <figure className="mb-5">
-        <div className="relative rounded overflow-hidden border border-panelline bg-ink">
-          <button
-            type="button"
-            onClick={() => setZoomed(true)}
-            className="block w-full cursor-zoom-in"
-            aria-label={`Enlarge screenshot: ${current.caption}`}
-          >
-            <Image
-              src={current.src}
-              alt={`${label} — ${current.caption}`}
-              width={1920}
-              height={1020}
-              sizes="(max-width: 768px) 100vw, 45vw"
-              className="w-full h-auto"
-              priority={index === 0}
-            />
-          </button>
+      <figure
+        className="mb-6"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        {/*
+          Below md the flanking slides are hidden and the centre goes
+          full-width: a 280px-wide coverflow leaves the screenshot too small to
+          read, which defeats the point of showing it.
+        */}
+        <div
+          className="relative w-full aspect-[1.95/1] md:aspect-[2.4/1]"
+          style={{ perspective: "1400px" }}
+        >
+          {shots.map((shot, i) => {
+            const offset = offsetOf(i);
+            const distance = Math.abs(offset);
+            if (distance > SPREAD) return null;
+
+            const isCentre = offset === 0;
+
+            return (
+              <button
+                key={shot.src}
+                type="button"
+                onClick={() => (isCentre ? setZoomed(true) : setIndex(i))}
+                aria-label={
+                  isCentre
+                    ? `Enlarge screenshot: ${shot.caption}`
+                    : `Show ${shot.caption}`
+                }
+                aria-current={isCentre}
+                className={`absolute top-1/2 left-1/2 transition-all duration-500 ease-out rounded overflow-hidden border md:w-[54%] ${
+                  isCentre
+                    ? "w-[86%] border-blueprint cursor-zoom-in shadow-2xl shadow-black/60"
+                    : "hidden md:block w-[54%] border-panelline cursor-pointer"
+                }`}
+                style={{
+                  transform: `translate(-50%, -50%) translateX(${offset * 46}%) scale(${
+                    1 - distance * 0.16
+                  }) rotateY(${offset * -26}deg)`,
+                  zIndex: 10 - distance,
+                  opacity: 1 - distance * 0.3,
+                  filter: isCentre ? "none" : "brightness(0.65)",
+                }}
+              >
+                <Image
+                  src={shot.src}
+                  alt={`${label} — ${shot.caption}`}
+                  width={1920}
+                  height={1020}
+                  sizes="(max-width: 768px) 60vw, 40vw"
+                  className="w-full h-auto"
+                  priority={i === 0}
+                />
+              </button>
+            );
+          })}
 
           <button
             type="button"
             onClick={() => go(-1)}
             aria-label="Previous screenshot"
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-ink/80 border border-panelline rounded px-2 py-1 font-mono text-sm text-paper hover:text-blueprint hover:border-blueprint transition-colors"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 px-2 py-4 font-mono text-2xl text-muted hover:text-blueprint transition-colors"
           >
             ‹
           </button>
@@ -76,24 +139,20 @@ export default function ProjectGallery({
             type="button"
             onClick={() => go(1)}
             aria-label="Next screenshot"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-ink/80 border border-panelline rounded px-2 py-1 font-mono text-sm text-paper hover:text-blueprint hover:border-blueprint transition-colors"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 px-2 py-4 font-mono text-2xl text-muted hover:text-blueprint transition-colors"
           >
             ›
           </button>
         </div>
 
-        <figcaption className="flex items-center justify-between gap-3 mt-2 font-mono text-xs">
-          <span className="text-muted truncate">{current.caption}</span>
-          <span className="text-muted shrink-0">
+        <figcaption className="text-center mt-3 font-mono text-xs">
+          <span className="text-paper">{current.caption}</span>
+          <span className="text-muted ml-3">
             {index + 1} / {shots.length}
           </span>
         </figcaption>
 
-        {/*
-          The bar stays 4px, but the button is padded so there is something
-          big enough to actually hit on a phone.
-        */}
-        <div className="flex gap-1.5 mt-1">
+        <div className="flex gap-1.5 mt-1 max-w-xs mx-auto">
           {shots.map((shot, i) => (
             <button
               key={shot.src}
@@ -123,12 +182,6 @@ export default function ProjectGallery({
           onClick={() => setZoomed(false)}
           className="fixed inset-0 z-50 bg-ink/95 flex flex-col items-center justify-center p-4 cursor-zoom-out"
         >
-          {/*
-            The wrapper carries a definite width. With w-auto on the image
-            itself, this flex child collapsed to about 1px until the file
-            finished loading, which flashed on open. Capped at 1200px so the
-            1.88:1 shot stays inside the viewport height without letterboxing.
-          */}
           <div
             className="w-[95vw] max-w-[1200px]"
             onClick={(e) => e.stopPropagation()}

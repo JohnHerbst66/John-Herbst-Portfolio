@@ -1,5 +1,6 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
+import TechStack from "@/components/TechStack";
 import FeaturedProjects from "@/components/FeaturedProjects";
 import LiveActivity from "@/components/LiveActivity";
 import Footer from "@/components/Footer";
@@ -13,6 +14,7 @@ export default async function Home() {
     <main>
       <Nav />
       <Hero latest={latest} />
+      <TechStack />
       <FeaturedProjects />
       <LiveActivity repos={repos} />
       <Footer />

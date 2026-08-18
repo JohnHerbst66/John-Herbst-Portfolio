@@ -1,5 +1,6 @@
 import { projects } from "@/content/projects";
 import ProjectCard from "./ProjectCard";
+import Reveal from "./Reveal";
 import { getRepoDetails } from "@/lib/github";
 
 export default async function FeaturedProjects() {
@@ -18,11 +19,13 @@ export default async function FeaturedProjects() {
       </h2>
       <div className="grid md:grid-cols-2 gap-6">
         {projects.map((project, i) => (
-          <ProjectCard
+          <Reveal
             key={project.slug}
-            project={project}
-            live={live[i]}
-          />
+            delay={i * 90}
+            className={project.screenshots?.length ? "md:col-span-2" : ""}
+          >
+            <ProjectCard project={project} live={live[i]} />
+          </Reveal>
         ))}
       </div>
     </section>
