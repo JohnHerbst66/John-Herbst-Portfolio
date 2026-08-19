@@ -3,6 +3,7 @@ import ScrollConstruct from "@/components/ScrollConstruct";
 import Hero from "@/components/Hero";
 import TechStack from "@/components/TechStack";
 import FeaturedProjects from "@/components/FeaturedProjects";
+import Qualification from "@/components/Qualification";
 import LiveActivity from "@/components/LiveActivity";
 import Footer from "@/components/Footer";
 import { getRecentRepos } from "@/lib/github";
@@ -18,6 +19,7 @@ export default async function Home() {
       <Hero latest={latest} />
       <TechStack />
       <FeaturedProjects />
+      <Qualification />
       <LiveActivity repos={repos} />
       <Footer />
     </main>
