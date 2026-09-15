@@ -99,8 +99,9 @@ export const practicalModules: Module[] = [
     name: "Test or Debug Source Code to Meet Client Needs",
     credits: 15,
     nqf: 5,
-    marks: [0, 92],
-    outcome: "NYC",
-    note: "Resubmission required",
+    // The statement recorded 0% here pending resubmission; the resubmitted
+    // workbook came back at 98%, which postdates the statement itself.
+    marks: [98, 92],
+    outcome: "C",
   },
 ];

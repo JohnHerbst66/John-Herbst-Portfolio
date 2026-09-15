@@ -141,8 +141,8 @@ export default function Qualification() {
           </div>
 
           <p className="font-mono text-[10px] text-muted mt-6">
-            C = competent · NYC = not yet competent. Transcribed from the QCTO
-            interim statement of results.
+            C = competent · NYC = not yet competent. From the QCTO interim
+            statement of results, with SWE-PM-04 updated after resubmission.
           </p>
         </div>
       </Reveal>
