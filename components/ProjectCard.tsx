@@ -100,7 +100,10 @@ export default function ProjectCard({
           </a>
         )}
         {!demoUrl && !repoUrl && (
-          <span className="text-muted">link pending</span>
+          // "link pending" would promise a link that is never coming.
+          <span className="text-muted">
+            {project.privateSource ? "source code private" : "link pending"}
+          </span>
         )}
         {live && (
           <span className="text-muted text-xs ml-auto">

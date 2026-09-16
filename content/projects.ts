@@ -16,7 +16,13 @@ export interface Project {
   outcome: string;
   demoUrl?: string;
   repoUrl?: string;
-  status: ProjectStatus; // "live" = has a working demo, "repo" = code only, "pending" = not pushed yet
+  status: ProjectStatus; // "live" = has a working demo, "repo" = code only, "pending" = in progress
+  /**
+   * The code exists but is deliberately kept private. Leave repoUrl and
+   * githubRepo unset for these: a link would 404 for visitors anyway, and
+   * either field would put the private repo's name on a public page.
+   */
+  privateSource?: boolean;
   /**
    * Repo name under the GitHub account. When set, the card pulls its stack and
    * tagline live from GitHub, so pushing code updates the site on its own.
@@ -29,6 +35,36 @@ export interface Project {
 // Add a new object to this array to feature a project. Nothing else needs to change —
 // the homepage reads this list directly. Order here is display order.
 export const projects: Project[] = [
+  {
+    slug: "the-forever-note",
+    name: "The Forever Note",
+    tagline:
+      "A full e-commerce platform for personalized digital gift pages, paired with a physical NFC/QR card delivered by post",
+    stack: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "Supabase (Postgres)",
+      "Vercel",
+      "PayFast",
+    ],
+    problem:
+      "Turning a personalized digital gift page into something physical — an NFC/QR card delivered by post — means owning the whole chain: building the page, taking payment, fulfilling the order, and producing print-ready card artwork.",
+    approach:
+      "Built end-to-end on Next.js (App Router) and TypeScript: a template-driven gift builder across 8+ occasion categories, tiered pricing with PayFast payment integration including signature-verified webhook confirmation, an admin dashboard for order fulfillment, buyer self-service editing, and a moderated reviews system.",
+    outcome:
+      "A print pipeline generates exact-spec CR80 bank-card artwork per order — SVG composition, embedded QR codes, and pre-shaped text outlines rasterized at 600 DPI — ready to hand straight to a printer. Deployed on Vercel with a protected preview environment and automated CI.",
+    status: "pending",
+    privateSource: true,
+    // Ordered along the buying journey. Browser UI is cropped out of each.
+    screenshots: [
+      { src: "/screenshots/the-forever-note/home.png", caption: "Landing page" },
+      { src: "/screenshots/the-forever-note/occasions.png", caption: "Eight occasion categories" },
+      { src: "/screenshots/the-forever-note/love-templates.png", caption: "Template designs for each occasion" },
+      { src: "/screenshots/the-forever-note/gift-builder.png", caption: "Gift builder with a live preview" },
+      { src: "/screenshots/the-forever-note/cart.png", caption: "Cart with tiered pricing" },
+    ],
+  },
   {
     slug: "spy-agency-app",
     name: "Spy Agency App",
