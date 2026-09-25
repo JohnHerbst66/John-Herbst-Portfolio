@@ -123,13 +123,23 @@ export const projects: Project[] = [
       "A .NET Core MVC web app for a local restaurant's delivery service",
     stack: ["C#", ".NET 10", "ASP.NET Core MVC", "EF Core"],
     problem:
-      "Koolstoof, a local restaurant, needs a delivery service built around how they actually operate rather than a generic ordering platform.",
+      "Koolstoof, a restaurant in Thabazimbi, needed online ordering built around how they actually work — their own menu and specials, their delivery suburbs, and somewhere for staff to run orders through without a second system.",
     approach:
-      "An ASP.NET Core MVC application on .NET 10, with Entity Framework Core over SQL Server for the data layer, ASP.NET Core Identity for accounts, and a Dockerfile so it runs the same everywhere.",
+      "An ASP.NET Core MVC application on .NET 10, with Entity Framework Core over SQL Server and ASP.NET Core Identity for staff accounts, containerised with Docker. Customers browse a categorised menu with live specials, build a cart, and check out by PayFast or cash on delivery; admin pages cover the menu, specials, settings and orders.",
     outcome:
-      "Early days — the project is scaffolded with Identity and the database context in place, and is being actively built out.",
+      "Live and taking orders. Staff move each one across a four-stage board — Incoming, Received, Out for Delivery, Delivered — with payment state on every card, delivery split by suburb, and drinks that can be flagged sit-down only so they never reach a delivery cart.",
+    demoUrl: "https://koolstoof.vercel.app",
     repoUrl: "https://github.com/JohnHerbst66/MVC-Koolstoof-Delivery-Web-App",
     githubRepo: "MVC-Koolstoof-Delivery-Web-App",
-    status: "repo",
+    status: "live",
+    // Padded to a single ratio so the strip does not go ragged; the phone shot
+    // is portrait and the cart shot is very wide.
+    screenshots: [
+      { src: "/screenshots/koolstoof/home.webp", caption: "Home page" },
+      { src: "/screenshots/koolstoof/menu.webp", caption: "Menu with categories and live specials" },
+      { src: "/screenshots/koolstoof/cart.webp", caption: "Cart" },
+      { src: "/screenshots/koolstoof/admin-orders.webp", caption: "Admin order board" },
+      { src: "/screenshots/koolstoof/mobile.webp", caption: "Mobile layout" },
+    ],
   },
 ];
