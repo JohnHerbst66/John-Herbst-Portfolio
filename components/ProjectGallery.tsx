@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Screenshot } from "@/content/projects";
 
 /** Seconds for the strip to travel one full set of shots. */
@@ -15,6 +15,9 @@ export default function ProjectGallery({
   label: string;
 }) {
   const [openAt, setOpenAt] = useState<number | null>(null);
+  const dialog = useRef<HTMLDivElement>(null);
+  /** The thumbnail that opened the dialog, so focus can go back to it. */
+  const opener = useRef<HTMLElement | null>(null);
 
   const go = useCallback(
     (delta: number) =>
@@ -37,9 +40,16 @@ export default function ProjectGallery({
     const previous = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
+    // Move focus into the dialog, otherwise keyboard focus stays behind on the
+    // thumbnail and Tab walks the page underneath instead of the overlay.
+    dialog.current?.focus();
+
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = previous;
+      // Hand focus back to the thumbnail that opened it.
+      opener.current?.focus();
+      opener.current = null;
     };
   }, [openAt, go]);
 
@@ -75,7 +85,10 @@ export default function ProjectGallery({
                 <button
                   key={`${shot.src}-${i}`}
                   type="button"
-                  onClick={() => setOpenAt(real)}
+                  onClick={(e) => {
+                    opener.current = e.currentTarget;
+                    setOpenAt(real);
+                  }}
                   aria-hidden={isClone}
                   tabIndex={isClone ? -1 : 0}
                   aria-label={`Enlarge screenshot: ${shot.caption}`}
@@ -98,17 +111,22 @@ export default function ProjectGallery({
         </div>
 
         <p className="mt-2 font-mono text-[10px] text-muted text-center">
-          {shots.length} screenshots · hover to pause, click to enlarge
+          {/* "hover to pause" alone is meaningless on a touch screen. */}
+          {shots.length} screenshots · tap or click to enlarge
         </p>
       </div>
 
       {current && (
         <div
+          ref={dialog}
           role="dialog"
           aria-modal="true"
           aria-label={`${label} screenshots`}
+          tabIndex={-1}
           onClick={() => setOpenAt(null)}
-          className="fixed inset-0 z-50 bg-ink/95 flex flex-col items-center justify-center p-4 cursor-zoom-out"
+          // overscroll-contain stops a scroll at the end of the overlay from
+          // chaining through to the page behind it.
+          className="fixed inset-0 z-50 bg-ink/95 flex flex-col items-center justify-center p-4 cursor-zoom-out overscroll-contain"
         >
           <div
             className="w-[92vw] max-w-[820px]"

@@ -7,3 +7,8 @@ out
 
 .vercel
 .env*
+
+# Agent skills installed via the `skills` CLI — local tooling, not site content
+.agents/
+.claude/skills/
+skills-lock.json

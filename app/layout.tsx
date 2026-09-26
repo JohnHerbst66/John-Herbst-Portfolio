@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -27,6 +27,11 @@ export const metadata: Metadata = {
   title: "John Herbst — Full-Stack Developer",
   description:
     "Full-stack developer working across Python, TypeScript, and C# — desktop tools to deployed web apps.",
+};
+
+/** Matches the page background, so mobile browser chrome blends with the site. */
+export const viewport: Viewport = {
+  themeColor: "#14181D",
 };
 
 export default function RootLayout({

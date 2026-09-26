@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Focus on desktop only. Autofocusing on a phone throws the keyboard up
+    // over the page the moment it loads.
+    if (window.matchMedia("(pointer: fine)").matches) input.current?.focus();
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,16 +49,26 @@ export default function LoginForm() {
       <h1 className="font-mono text-sm tracking-wider text-blueprint mb-6">
         // ADMIN LOGIN
       </h1>
+      {/* Visually hidden: the panel heading already says what this is, but a
+          placeholder is not a label for a screen reader. */}
+      <label htmlFor="admin-password" className="sr-only">
+        Password
+      </label>
       <input
+        ref={input}
+        id="admin-password"
         type="password"
         name="password"
+        autoComplete="current-password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="password"
-        autoFocus
-        className="w-full bg-ink border border-panelline rounded px-3 py-2 font-mono text-sm text-paper mb-4 focus:outline-none focus:border-blueprint"
+        className="w-full bg-ink border border-panelline rounded px-3 py-2 font-mono text-sm text-paper mb-4 focus:border-blueprint"
       />
-      {error && <p className="font-mono text-xs text-signal mb-4">{error}</p>}
+      {/* Announced when it appears, rather than changing silently. */}
+      <p aria-live="polite" className="font-mono text-xs text-signal empty:hidden mb-4">
+        {error}
+      </p>
       <button
         type="submit"
         disabled={loading || password.length === 0}

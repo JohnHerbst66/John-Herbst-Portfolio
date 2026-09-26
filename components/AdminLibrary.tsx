@@ -101,14 +101,17 @@ export default function AdminLibrary({ library }: { library: Library }) {
         // MANAGE FILES
       </h2>
 
-      {error && <p className="font-mono text-xs text-signal mb-3">{error}</p>}
+      {/* Announced when a folder or file action fails. */}
+      <p aria-live="polite" className="font-mono text-xs text-signal empty:hidden mb-3">
+        {error}
+      </p>
 
       <form onSubmit={createFolder} className="flex gap-2 mb-5">
         <input
           value={newFolder}
           onChange={(e) => setNewFolder(e.target.value)}
           placeholder="new folder name"
-          className="flex-1 bg-ink border border-panelline rounded px-3 py-2 font-mono text-xs text-paper focus:outline-none focus:border-blueprint"
+          className="flex-1 bg-ink border border-panelline rounded px-3 py-2 font-mono text-xs text-paper focus:border-blueprint"
         />
         <button
           type="submit"
@@ -185,7 +188,7 @@ export default function AdminLibrary({ library }: { library: Library }) {
                   value={renameTo}
                   onChange={(e) => setRenameTo(e.target.value)}
                   autoFocus
-                  className="flex-1 bg-ink border border-panelline rounded px-2 py-1 text-paper focus:outline-none focus:border-blueprint"
+                  className="flex-1 bg-ink border border-panelline rounded px-2 py-1 text-paper focus:border-blueprint"
                 />
                 <button
                   onClick={async () => {
@@ -227,7 +230,7 @@ export default function AdminLibrary({ library }: { library: Library }) {
                     value={confirmText}
                     onChange={(e) => setConfirmText(e.target.value)}
                     autoFocus
-                    className="flex-1 bg-ink border border-panelline rounded px-2 py-1 text-paper focus:outline-none focus:border-signal"
+                    className="flex-1 bg-ink border border-panelline rounded px-2 py-1 text-paper focus:border-signal"
                   />
                   <button
                     onClick={async () => {

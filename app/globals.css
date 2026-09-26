@@ -4,6 +4,9 @@
 
 html {
   scroll-behavior: smooth;
+  /* Tells the browser this is a dark UI, so native scrollbars, form controls
+     and the <select> dropdown render dark instead of light. */
+  color-scheme: dark;
 }
 
 body {

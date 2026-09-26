@@ -53,10 +53,10 @@ function ModuleTable({
                 </td>
                 <td className="text-right text-muted py-2 px-2">{m.credits}</td>
                 <td className="text-right text-muted py-2 px-2">{m.nqf}</td>
-                <td className="text-right text-paper py-2 px-2">
+                <td className="text-right text-paper py-2 px-2 tabular-nums">
                   {m.marks[0]}%
                 </td>
-                <td className="text-right text-paper py-2 px-2">
+                <td className="text-right text-paper py-2 px-2 tabular-nums">
                   {m.marks[1]}%
                 </td>
                 <td className="text-right py-2 pl-2">

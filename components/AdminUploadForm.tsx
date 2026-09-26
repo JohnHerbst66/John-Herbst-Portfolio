@@ -87,10 +87,11 @@ export default function AdminUploadForm({
         // UPLOAD PORTFOLIO FILES
       </h1>
 
-      <label className="block font-mono text-xs text-muted mb-2">
+      <label htmlFor="upload-files" className="block font-mono text-xs text-muted mb-2">
         Select files
       </label>
       <input
+        id="upload-files"
         type="file"
         multiple
         onChange={handleFileSelect}
@@ -99,13 +100,14 @@ export default function AdminUploadForm({
 
       {folderNames.length > 0 && (
         <>
-          <label className="block font-mono text-xs text-muted mb-2">
+          <label htmlFor="upload-folder" className="block font-mono text-xs text-muted mb-2">
             Upload into
           </label>
           <select
+            id="upload-folder"
             value={folder}
             onChange={(e) => setFolder(e.target.value)}
-            className="w-full mb-4 bg-ink border border-panelline rounded px-3 py-2 font-mono text-xs text-paper focus:outline-none focus:border-blueprint"
+            className="w-full mb-4 bg-ink border border-panelline rounded px-3 py-2 font-mono text-xs text-paper focus:border-blueprint"
           >
             <option value="">no folder</option>
             {folderNames.map((name) => (
@@ -123,9 +125,11 @@ export default function AdminUploadForm({
         </p>
       )}
 
-      {status && (
-        <p className="font-mono text-xs text-signal mb-4">{status}</p>
-      )}
+      {/* Upload progress and failures change asynchronously, so they are
+          announced rather than appearing silently. */}
+      <p aria-live="polite" className="font-mono text-xs text-signal empty:hidden mb-4">
+        {status}
+      </p>
 
       <button
         type="submit"

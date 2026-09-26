@@ -16,6 +16,9 @@ const stroke = {
   strokeWidth: 1.6,
   strokeLinecap: "round" as const,
   strokeLinejoin: "round" as const,
+  // Every icon sits beside its own text label, so it is decoration to a
+  // screen reader. Spread onto all of them, so none can be missed.
+  "aria-hidden": true,
 };
 
 const TECH: Tech[] = [
