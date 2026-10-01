@@ -49,6 +49,12 @@ export const projects: Project[] = [
       "A responsive Afrikaans site with a custom antique Boer farmhouse look: aged-paper textures, chalkboard and picture-frame styling, and a wagon-wheel seal logo designed for it. Each day's update takes the owners three fields and one tap, and with no database or payment fees there is almost nothing to run.",
     status: "live",
     privateSource: true,
+    screenshots: [
+      { src: "/screenshots/die-bestemming/menu.webp", caption: "The day's menu, added to a basket" },
+      { src: "/screenshots/die-bestemming/car-wash.webp", caption: "Car wash pricing and valet options" },
+      { src: "/screenshots/die-bestemming/basket.webp", caption: "Basket handed over as a WhatsApp order" },
+      { src: "/screenshots/die-bestemming/hours.webp", caption: "Opening hours and location" },
+    ],
   },
   {
     slug: "the-forever-note",
