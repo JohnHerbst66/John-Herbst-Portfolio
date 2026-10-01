@@ -36,6 +36,21 @@ export interface Project {
 // the homepage reads this list directly. Order here is display order.
 export const projects: Project[] = [
   {
+    slug: "die-bestemming",
+    name: "Die Bestemming",
+    tagline:
+      "An Afrikaans ordering site for a family takeaway and car wash, run from the owners' phones with no database",
+    stack: ["Next.js", "TypeScript", "React", "Vercel", "Vercel Blob"],
+    problem:
+      "A family-run takeaway and car wash in Thabazimbi sold its daily dinner through hand-made Facebook posters and took orders by phone. They needed a website customers could order from on their phones — no payments, no accounts — and the owners had to be able to update it themselves from a phone in under a minute.",
+    approach:
+      "Next.js (App Router) and TypeScript with no database: all content is a single versioned JSON file in Vercel Blob, which keeps running costs near zero. Customers fill a basket that stays on their phone, and the site turns it into a pre-filled WhatsApp order with prices and a total. The day's dinner opens and closes for orders automatically on South African time, and a password-protected, phone-first admin in Afrikaans lets the owners upload the day's poster, edit the menu, car wash prices and opening hours, and manage a gallery — with photos shrunk in the browser before upload.",
+    outcome:
+      "A responsive Afrikaans site with a custom antique Boer farmhouse look: aged-paper textures, chalkboard and picture-frame styling, and a wagon-wheel seal logo designed for it. Each day's update takes the owners three fields and one tap, and with no database or payment fees there is almost nothing to run.",
+    status: "live",
+    privateSource: true,
+  },
+  {
     slug: "the-forever-note",
     name: "The Forever Note",
     tagline:
