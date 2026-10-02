@@ -149,11 +149,13 @@ export const projects: Project[] = [
     approach:
       "An ASP.NET Core MVC application on .NET 10, with Entity Framework Core over SQL Server and ASP.NET Core Identity for staff accounts, containerised with Docker. Customers browse a categorised menu with live specials, build a cart, and check out by PayFast or cash on delivery; admin pages cover the menu, specials, settings and orders.",
     outcome:
-      "Live and taking orders. Staff move each one across a four-stage board — Incoming, Received, Out for Delivery, Delivered — with payment state on every card, delivery split by suburb, and drinks that can be flagged sit-down only so they never reach a delivery cart.",
+      "Built and deployed, with handover pending. Staff move each order across a four-stage board — Incoming, Received, Out for Delivery, Delivered — with payment state on every card, delivery split by suburb, and drinks that can be flagged sit-down only so they never reach a delivery cart.",
+    // The deployment is publicly reachable, so the demo link stands, but the
+    // restaurant is not running on it yet - that is not LIVE.
     demoUrl: "https://koolstoof.vercel.app",
     repoUrl: "https://github.com/JohnHerbst66/MVC-Koolstoof-Delivery-Web-App",
     githubRepo: "MVC-Koolstoof-Delivery-Web-App",
-    status: "live",
+    status: "pending",
     // Padded to a single ratio so the strip does not go ragged; the phone shot
     // is portrait and the cart shot is very wide.
     screenshots: [
