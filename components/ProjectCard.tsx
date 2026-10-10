@@ -1,5 +1,6 @@
 import { Project } from "@/content/projects";
 import ProjectGallery from "./ProjectGallery";
+import SitePreview from "./SitePreview";
 import { RepoDetails, timeAgo } from "@/lib/github";
 
 const statusLabel: Record<Project["status"], string> = {
@@ -54,8 +55,19 @@ export default function ProjectCard({
       </h3>
       <p className="font-body text-muted text-sm mb-4">{tagline}</p>
 
-      {project.screenshots && project.screenshots.length > 0 && (
-        <ProjectGallery shots={project.screenshots} label={project.name} />
+      {/* A live site speaks for itself; the slider is for work that has no
+          public URL to show — the desktop app, and anything not yet shipped. */}
+      {project.preview ? (
+        <SitePreview
+          src={project.preview.src}
+          url={project.preview.url}
+          label={project.name}
+        />
+      ) : (
+        project.screenshots &&
+        project.screenshots.length > 0 && (
+          <ProjectGallery shots={project.screenshots} label={project.name} />
+        )
       )}
 
       <div className="flex flex-wrap gap-2 mb-5">

@@ -39,6 +39,11 @@ export interface Project {
    * tagline live from GitHub, so pushing code updates the site on its own.
    */
   githubRepo?: string;
+  /**
+   * A capture of the running site, shown in a browser frame. Takes the place
+   * of the screenshot slider where the site is public.
+   */
+  preview?: { src: string; url: string };
   /** Screenshots shown as a slider on the card. */
   screenshots?: Screenshot[];
 }
@@ -165,6 +170,10 @@ export const projects: Project[] = [
       "Built and deployed, with handover pending. Staff move each order across a four-stage board — Incoming, Received, Out for Delivery, Delivered — with payment state on every card, delivery split by suburb, and drinks that can be flagged sit-down only so they never reach a delivery cart.",
     // The deployment is publicly reachable, so the demo link stands, but the
     // restaurant is not running on it yet - that is not LIVE.
+    preview: {
+      src: "/previews/koolstoof.webp",
+      url: "https://koolstoof.vercel.app",
+    },
     demoUrl: "https://koolstoof.vercel.app",
     repoUrl: "https://github.com/JohnHerbst66/MVC-Koolstoof-Delivery-Web-App",
     githubRepo: "MVC-Koolstoof-Delivery-Web-App",
