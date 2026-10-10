@@ -92,7 +92,12 @@ export const projects: Project[] = [
       "Built end-to-end on Next.js (App Router) and TypeScript: a template-driven gift builder across 8+ occasion categories, tiered pricing with PayFast payment integration including signature-verified webhook confirmation, an admin dashboard for order fulfillment, buyer self-service editing, and a moderated reviews system.",
     outcome:
       "A print pipeline generates exact-spec CR80 bank-card artwork per order — SVG composition, embedded QR codes, and pre-shaped text outlines rasterized at 600 DPI — ready to hand straight to a printer. Deployed on Vercel with a protected preview environment and automated CI.",
-    status: "building",
+    preview: {
+      src: "/previews/the-forever-note.webp",
+      url: "https://forever-note.vercel.app",
+    },
+    demoUrl: "https://forever-note.vercel.app",
+    status: "deployed",
     privateSource: true,
     // Ordered along the buying journey. Browser UI is cropped out of each.
     screenshots: [
