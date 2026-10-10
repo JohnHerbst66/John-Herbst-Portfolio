@@ -1,4 +1,13 @@
-export type ProjectStatus = "live" | "repo" | "pending";
+/**
+ * What state the project is in. Kept separate from who it was built for:
+ * one vague "in progress" across three commissioned projects made finished
+ * client work read as unfinished.
+ */
+export type ProjectStatus =
+  | "live" // public and in service
+  | "daily-use" // running in a business every day
+  | "deployed" // reachable and demonstrable, handover pending
+  | "building"; // still being built
 
 export interface Screenshot {
   /** Path under /public. */
@@ -16,7 +25,9 @@ export interface Project {
   outcome: string;
   demoUrl?: string;
   repoUrl?: string;
-  status: ProjectStatus; // "live" = has a working demo, "repo" = code only, "pending" = in progress
+  status: ProjectStatus;
+  /** Commissioned by a business, rather than John's own project. */
+  clientWork?: boolean;
   /**
    * The code exists but is deliberately kept private. Leave repoUrl and
    * githubRepo unset for these: a link would 404 for visitors anyway, and
@@ -48,7 +59,8 @@ export const projects: Project[] = [
     outcome:
       "A responsive Afrikaans site with a custom antique Boer farmhouse look: aged-paper textures, chalkboard and picture-frame styling, and a wagon-wheel seal logo designed for it. A day's update is three fields and one tap, and with no database or payment fees there is almost nothing to run.",
     // Built but not deployed yet, so it must not claim LIVE.
-    status: "pending",
+    status: "live",
+    clientWork: true,
     privateSource: true,
     screenshots: [
       { src: "/screenshots/die-bestemming/menu.webp", caption: "The day's menu, added to a basket" },
@@ -76,7 +88,7 @@ export const projects: Project[] = [
       "Built end-to-end on Next.js (App Router) and TypeScript: a template-driven gift builder across 8+ occasion categories, tiered pricing with PayFast payment integration including signature-verified webhook confirmation, an admin dashboard for order fulfillment, buyer self-service editing, and a moderated reviews system.",
     outcome:
       "A print pipeline generates exact-spec CR80 bank-card artwork per order — SVG composition, embedded QR codes, and pre-shaped text outlines rasterized at 600 DPI — ready to hand straight to a printer. Deployed on Vercel with a protected preview environment and automated CI.",
-    status: "pending",
+    status: "building",
     privateSource: true,
     // Ordered along the buying journey. Browser UI is cropped out of each.
     screenshots: [
@@ -122,7 +134,8 @@ export const projects: Project[] = [
     outcome:
       "An actively evolving system — recent updates added truck registration enforcement and refined the print workflow based on real usage.",
     repoUrl: "https://github.com/JohnHerbst66/SlipManagement2",
-    status: "repo",
+    status: "daily-use",
+    clientWork: true,
     screenshots: [
       { src: "/screenshots/slip-management/main-page.png", caption: "Main dashboard with the daily summary" },
       { src: "/screenshots/slip-management/create-a-slip.png", caption: "Creating a slip" },
@@ -155,7 +168,8 @@ export const projects: Project[] = [
     demoUrl: "https://koolstoof.vercel.app",
     repoUrl: "https://github.com/JohnHerbst66/MVC-Koolstoof-Delivery-Web-App",
     githubRepo: "MVC-Koolstoof-Delivery-Web-App",
-    status: "pending",
+    status: "deployed",
+    clientWork: true,
     // Padded to a single ratio so the strip does not go ragged; the phone shot
     // is portrait and the cart shot is very wide.
     screenshots: [

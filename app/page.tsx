@@ -1,5 +1,4 @@
 import Nav from "@/components/Nav";
-import ScrollConstruct from "@/components/ScrollConstruct";
 import Hero from "@/components/Hero";
 import TechStack from "@/components/TechStack";
 import FeaturedProjects from "@/components/FeaturedProjects";
@@ -14,7 +13,6 @@ export default async function Home() {
 
   return (
     <main>
-      <ScrollConstruct />
       <Nav />
       <Hero latest={latest} />
       <TechStack />

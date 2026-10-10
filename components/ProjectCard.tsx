@@ -4,14 +4,17 @@ import { RepoDetails, timeAgo } from "@/lib/github";
 
 const statusLabel: Record<Project["status"], string> = {
   live: "LIVE",
-  repo: "CODE AVAILABLE",
-  pending: "IN PROGRESS",
+  "daily-use": "IN DAILY USE",
+  deployed: "DEPLOYED",
+  building: "IN DEVELOPMENT",
 };
 
+// Amber is reserved for things actually in service; everything else is quieter.
 const statusColor: Record<Project["status"], string> = {
   live: "text-signal",
-  repo: "text-blueprint",
-  pending: "text-muted",
+  "daily-use": "text-signal",
+  deployed: "text-blueprint",
+  building: "text-muted",
 };
 
 export default function ProjectCard({
@@ -36,10 +39,13 @@ export default function ProjectCard({
         <span className="font-mono text-xs tracking-wider text-muted">
           FIG — {project.slug.toUpperCase()}
         </span>
-        <span
-          className={`font-mono text-xs tracking-wider ${statusColor[project.status]}`}
-        >
-          {statusLabel[project.status]}
+        <span className="flex items-center gap-3 font-mono text-xs tracking-wider">
+          {project.clientWork && (
+            <span className="text-violet">CLIENT WORK</span>
+          )}
+          <span className={statusColor[project.status]}>
+            {statusLabel[project.status]}
+          </span>
         </span>
       </div>
 

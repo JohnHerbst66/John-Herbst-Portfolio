@@ -12,9 +12,15 @@ const config: Config = {
         ink: "#14181D",       // base background, charcoal-navy (not pure black)
         panel: "#1B222B",     // card/panel background
         panelline: "#28323D", // panel border
+        // Three accents, each with one job, so they never read as confetti:
+        //   blueprint — structure, labels, links (the identity)
+        //   violet    — interaction: hover, focus-adjacent, preview chrome
+        //   signal    — status only: LIVE, IN DAILY USE
         blueprint: "#5B9BD9", // primary structural accent
         blueprintdim: "#3E6FA8",
-        signal: "#E8A33D",    // sparse status/live accent
+        violet: "#A98BFF",    // sharp purple, second voice beside the blue
+        violetdim: "#6E53C8",
+        signal: "#E8A33D",    // sparse status accent
         paper: "#E7EAEE",     // primary text, cool off-white
         muted: "#8B96A5",     // secondary text
       },
