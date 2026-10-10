@@ -181,7 +181,6 @@ export const projects: Project[] = [
     // Padded to a single ratio so the strip does not go ragged; the phone shot
     // is portrait and the cart shot is very wide.
     screenshots: [
-      { src: "/screenshots/koolstoof/home.webp", caption: "Home page" },
       { src: "/screenshots/koolstoof/menu.webp", caption: "Menu with categories and live specials" },
       { src: "/screenshots/koolstoof/cart.webp", caption: "Cart" },
       { src: "/screenshots/koolstoof/admin-orders.webp", caption: "Admin order board" },

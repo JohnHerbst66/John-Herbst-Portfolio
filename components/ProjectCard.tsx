@@ -55,19 +55,19 @@ export default function ProjectCard({
       </h3>
       <p className="font-body text-muted text-sm mb-4">{tagline}</p>
 
-      {/* A live site speaks for itself; the slider is for work that has no
-          public URL to show — the desktop app, and anything not yet shipped. */}
-      {project.preview ? (
+      {/* The preview shows the public face of the site; the strip underneath
+          carries what a visitor cannot reach — admin screens behind a login,
+          and work with no public URL at all. */}
+      {project.preview && (
         <SitePreview
           src={project.preview.src}
           url={project.preview.url}
           label={project.name}
         />
-      ) : (
-        project.screenshots &&
-        project.screenshots.length > 0 && (
-          <ProjectGallery shots={project.screenshots} label={project.name} />
-        )
+      )}
+
+      {project.screenshots && project.screenshots.length > 0 && (
+        <ProjectGallery shots={project.screenshots} label={project.name} />
       )}
 
       <div className="flex flex-wrap gap-2 mb-5">
