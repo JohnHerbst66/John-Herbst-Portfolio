@@ -62,17 +62,16 @@ export const projects: Project[] = [
     approach:
       "Next.js (App Router) and TypeScript with no database: all content is a single versioned JSON file in Vercel Blob, which keeps running costs near zero. Customers fill a basket that stays on their phone, and the site turns it into a pre-filled WhatsApp order with prices and a total. The day's dinner opens and closes for orders automatically on South African time, and a password-protected, phone-first admin in Afrikaans lets the owners upload the day's poster, edit the menu, car wash prices and opening hours, and manage a gallery — with photos shrunk in the browser before upload.",
     outcome:
-      "A responsive Afrikaans site with a custom antique Boer farmhouse look: aged-paper textures, chalkboard and picture-frame styling, and a wagon-wheel seal logo designed for it. A day's update is three fields and one tap, and with no database or payment fees there is almost nothing to run.",
+      "Live at die-bestemming.vercel.app, with a look built for it: deep navy and yellow, a stylised thorn-tree mark, and badge-style controls. A day's update is three fields and one tap, and with no database or payment fees there is almost nothing to run.",
     // Built but not deployed yet, so it must not claim LIVE.
+    preview: {
+      src: "/previews/die-bestemming.webp",
+      url: "https://die-bestemming.vercel.app",
+    },
+    demoUrl: "https://die-bestemming.vercel.app",
     status: "live",
     clientWork: true,
     privateSource: true,
-    screenshots: [
-      { src: "/screenshots/die-bestemming/menu.webp", caption: "The day's menu, added to a basket" },
-      { src: "/screenshots/die-bestemming/car-wash.webp", caption: "Car wash pricing and valet options" },
-      { src: "/screenshots/die-bestemming/basket.webp", caption: "Basket handed over as a WhatsApp order" },
-      { src: "/screenshots/die-bestemming/hours.webp", caption: "Opening hours and location" },
-    ],
   },
   {
     slug: "the-forever-note",
