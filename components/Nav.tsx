@@ -14,10 +14,10 @@ export default function Nav() {
           src="/avatar.webp"
           alt=""
           aria-hidden="true"
-          width={623}
-          height={1205}
+          width={577}
+          height={771}
           priority
-          className="h-11 w-auto shrink-0 transition-transform group-hover:-translate-y-0.5"
+          className="h-14 w-auto shrink-0 transition-transform group-hover:-translate-y-0.5"
         />
         JOHN HERBST
       </Link>
