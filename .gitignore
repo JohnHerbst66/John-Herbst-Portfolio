@@ -12,3 +12,6 @@ out
 .agents/
 .claude/skills/
 skills-lock.json
+
+# Left behind by `tsc --noEmit`; not part of the build output.
+*.tsbuildinfo

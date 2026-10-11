@@ -3,8 +3,9 @@
   "configurations": [
     {
       "name": "portfolio-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "//": "Calls next directly rather than through npm: the npm.cmd shim mis-parses this project's path, which contains a space, and exits before it starts.",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/next/dist/bin/next", "dev"],
       "port": 3000,
       "autoPort": true
     }
