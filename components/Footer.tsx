@@ -8,7 +8,9 @@ export default function Footer() {
         // CONTACT
       </h2>
       <p className="font-body text-muted max-w-md mb-6">
-        Open to full-stack roles and collaborations. Reach out directly.
+        Looking for a junior developer role or a graduate placement — remote,
+        or relocating for the right one. I also take on freelance builds for
+        businesses that need a site or a system.
       </p>
       <div className="flex flex-wrap gap-6 font-mono text-sm">
         <a

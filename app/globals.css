@@ -100,3 +100,318 @@ body {
   outline: 2px solid #5B9BD9;
   outline-offset: 2px;
 }
+
+/*
+  Device showcase in the hero. Each pass turns in from the left, settles in
+  the middle, then turns away to the right as the next one arrives.
+
+  All four passes share one timeline and are separated by a positive delay of
+  cycle/n, so they cannot drift apart the way four independent timers would.
+  Everything outside a pass's own quarter of the cycle is spent parked
+  offstage at zero opacity; the jump back to the left edge at 22.001% happens
+  while invisible.
+*/
+.dv-stage {
+  position: relative;
+  height: 400px;
+  perspective: 1600px;
+  /* Full-bleed, so the devices arrive from the edges of the screen rather
+     than from the inner edge of the page's content column. The hero section
+     clips the overhang; without that the passes widen the page and every
+     line of text shifts right. */
+  margin-inline: calc(50% - 50vw);
+}
+@media (min-width: 768px) {
+  .dv-stage { height: 480px; }
+}
+/* Pool of light on the floor, so the devices are standing somewhere. */
+.dv-stage::before {
+  content: "";
+  position: absolute;
+  inset: auto 0 6% 0;
+  height: 55%;
+  background: radial-gradient(
+    60% 100% at 50% 100%,
+    rgba(169, 139, 255, 0.16),
+    rgba(91, 155, 217, 0.08) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.dv-pass {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 2.75rem;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  animation: dv-pass var(--cycle) linear infinite both;
+  animation-delay: calc(var(--i) * var(--cycle) / var(--n));
+}
+
+@keyframes dv-pass {
+  0% {
+    opacity: 0;
+    transform: translate3d(-58%, 0, -260px) rotateY(-38deg);
+    animation-timing-function: cubic-bezier(0.18, 0.72, 0.3, 1);
+  }
+  7% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotateY(0deg);
+    animation-timing-function: linear;
+  }
+  17% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotateY(0deg);
+    animation-timing-function: cubic-bezier(0.6, 0.02, 0.86, 0.36);
+  }
+  22% {
+    opacity: 0;
+    transform: translate3d(58%, 0, -260px) rotateY(38deg);
+  }
+  22.001%,
+  100% {
+    opacity: 0;
+    transform: translate3d(-58%, 0, -260px) rotateY(-38deg);
+  }
+}
+
+/*
+  The caption is readable only while its device is standing still. Without
+  this it fades with the device, and during a handover the outgoing and
+  incoming captions sit on the same line and overlap each other.
+*/
+.dv-caption {
+  animation: dv-caption var(--cycle) linear infinite both;
+  animation-delay: calc(var(--i) * var(--cycle) / var(--n));
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+@keyframes dv-caption {
+  0%,
+  5.5% {
+    opacity: 0;
+  }
+  8%,
+  16% {
+    opacity: 1;
+  }
+  18.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/*
+  Code drifting across the back of the stage.
+
+  No overflow:hidden here on purpose: that would flatten the layer into its
+  own 2D context and throw away the per-fragment depth. The hero section's
+  overflow-x clip already stops the travel widening the page.
+*/
+.dv-code {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  user-select: none;
+}
+.dv-code span {
+  position: absolute;
+  left: 0;
+  top: var(--top);
+  white-space: nowrap;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: var(--size);
+  color: #5b9bd9;
+  animation: dv-drift var(--dur) linear infinite both;
+  animation-delay: var(--delay);
+}
+.dv-code .dv-violet {
+  color: #a98bff;
+}
+
+@keyframes dv-drift {
+  0% {
+    opacity: 0;
+    transform: translate3d(-28vw, 0, var(--z));
+  }
+  10%,
+  90% {
+    opacity: var(--o);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(128vw, 0, var(--z));
+  }
+}
+
+/* --- the devices themselves: drawn in CSS, not images --- */
+
+.dv-laptop { width: min(560px, 76vw); }
+.dv-lid {
+  border: 8px solid #28323d;
+  border-bottom-width: 11px;
+  border-radius: 12px 12px 3px 3px;
+  background: #14181d;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(169, 139, 255, 0.16),
+    0 34px 60px -24px rgba(0, 0, 0, 0.85);
+}
+/* Wider than the lid and tapered, so it reads as lying flat and receding. */
+.dv-base {
+  width: 112%;
+  margin-left: -6%;
+  height: 13px;
+  position: relative;
+  background: linear-gradient(#303b49, #1a2029);
+  clip-path: polygon(1.5% 0, 98.5% 0, 94% 100%, 6% 100%);
+}
+.dv-base::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 13%;
+  height: 4px;
+  border-radius: 0 0 4px 4px;
+  background: #3c4a5c;
+}
+
+.dv-phone { width: min(180px, 38vw); }
+.dv-shell {
+  position: relative;
+  border: 7px solid #28323d;
+  border-radius: 30px;
+  background: #14181d;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(169, 139, 255, 0.16),
+    0 34px 60px -24px rgba(0, 0, 0, 0.85);
+}
+.dv-island {
+  position: absolute;
+  z-index: 2;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 15px;
+  border-radius: 999px;
+  background: #0d1014;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Drifting code is motion and nothing else, so it goes entirely. */
+  .dv-code {
+    display: none;
+  }
+  /* No fly-past. The first pass simply stands there; the rest are dropped,
+     since without the rotation they would stack on top of each other. */
+  .dv-pass,
+  .dv-caption {
+    animation: none;
+    opacity: 0;
+    transform: none;
+  }
+  .dv-pass:first-child,
+  .dv-pass:first-child .dv-caption {
+    opacity: 1;
+  }
+}
+
+/*
+  CV page. Dark-on-white, unlike the rest of the site: this document exists to
+  become a PDF and to go through a printer, where the ink background would
+  come out as a solid black sheet.
+*/
+@page {
+  size: A4;
+  /* A full inch. 14mm then 20mm both still read as cramped on paper. */
+  margin: 25mm;
+}
+
+/*
+  The site sets a dark body and color-scheme: dark on <html>, which left the
+  ink background showing around the sheet and rendered the scrollbar dark
+  against it. Both are turned back to light for this route only — keyed off
+  the CV's own root element, so no separate layout is needed.
+*/
+html:has(.cv-root) {
+  color-scheme: light;
+}
+body:has(.cv-root) {
+  background-color: #fff;
+  color: #171717;
+}
+.cv-root {
+  min-height: 100vh;
+  background-color: #fff;
+}
+.cv-page {
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 25mm;
+}
+.cv-section {
+  margin-bottom: 14px;
+}
+/* A single build splitting across a page break is the one thing that always
+   looks wrong; sections themselves are free to break. */
+.cv-entry {
+  break-inside: avoid;
+}
+
+.cv-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  max-width: 210mm;
+  margin: 0 auto;
+  padding: 0.7rem 25mm;
+  border-bottom: 1px solid #e5e7eb;
+  font-family: var(--font-plex-mono), monospace;
+  font-size: 11px;
+  color: #6b7280;
+}
+.cv-bar kbd {
+  font: inherit;
+  border: 1px solid #d1d5db;
+  border-radius: 3px;
+  padding: 0 3px;
+}
+
+@media print {
+  /* The site's dark grid belongs to the screen, not to paper. */
+  body {
+    background: #fff !important;
+  }
+  .cv-bar {
+    display: none;
+  }
+  .cv-page {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+  /* Underlined blue links read as noise once the page cannot be clicked. */
+  .cv-root a {
+    color: inherit;
+    text-decoration: none;
+  }
+}

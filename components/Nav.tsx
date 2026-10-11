@@ -33,8 +33,8 @@ export default function Nav() {
         <a href="/#activity" className="hover:text-blueprint transition-colors">
           activity
         </a>
-        <Link href="/files" className="hover:text-blueprint transition-colors">
-          files
+        <Link href="/cv" className="hover:text-blueprint transition-colors">
+          cv
         </Link>
         <a href="/#contact" className="hover:text-blueprint transition-colors">
           contact

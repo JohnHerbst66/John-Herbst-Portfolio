@@ -63,7 +63,6 @@ export const projects: Project[] = [
       "Next.js (App Router) and TypeScript with no database: all content is a single versioned JSON file in Vercel Blob, which keeps running costs near zero. Customers fill a basket that stays on their phone, and the site turns it into a pre-filled WhatsApp order with prices and a total. The day's dinner opens and closes for orders automatically on South African time, and a password-protected, phone-first admin in Afrikaans lets the owners upload the day's poster, edit the menu, car wash prices and opening hours, and manage a gallery — with photos shrunk in the browser before upload.",
     outcome:
       "Live at die-bestemming.vercel.app, with a look built for it: deep navy and yellow, a stylised thorn-tree mark, and badge-style controls. A day's update is three fields and one tap, and with no database or payment fees there is almost nothing to run.",
-    // Built but not deployed yet, so it must not claim LIVE.
     preview: {
       src: "/previews/die-bestemming.webp",
       url: "https://die-bestemming.vercel.app",
@@ -72,6 +71,16 @@ export const projects: Project[] = [
     status: "live",
     clientWork: true,
     privateSource: true,
+    // In page order, the way a customer meets the site. Captured after the
+    // navy-and-yellow redesign; the earlier cream-farmhouse shots were of a
+    // look that no longer exists.
+    screenshots: [
+      { src: "/screenshots/die-bestemming/home.webp", caption: "Landing page — car wash or takeaway" },
+      { src: "/screenshots/die-bestemming/menu.webp", caption: "Spyskaart — the priced menu" },
+      { src: "/screenshots/die-bestemming/kitchen.webp", caption: "Uit ons kombuis — the photo gallery" },
+      { src: "/screenshots/die-bestemming/car-wash.webp", caption: "Kar was — valet and wash pricing" },
+      { src: "/screenshots/die-bestemming/hours.webp", caption: "Opening hours and directions" },
+    ],
   },
   {
     slug: "the-forever-note",
